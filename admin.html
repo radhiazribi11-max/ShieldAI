@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ShieldAI | Master Control</title>
+    <style>
+        body { font-family: sans-serif; background: #050505; color: #fff; padding: 50px; }
+        .panel { max-width: 800px; margin: auto; background: #0c0c0c; padding: 40px; border-radius: 20px; border: 1px solid #1a1a1a; }
+        input { background: #151515; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; width: 60%; }
+        button { background: #0070f3; color: #fff; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .key-row { display: flex; justify-content: space-between; padding: 15px; background: #111; margin-top: 10px; border-radius: 8px; font-family: monospace; }
+    </style>
+</head>
+<body id="admin-body" style="display:none;">
+    <div class="panel">
+        <h1>Master Control</h1>
+        <p style="color:#666">Generate Enterprise Licenses (sk_live)</p>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="clientName" placeholder="Client Name (e.g. Tesla)">
+            <button onclick="create()">Generate Key</button>
+        </div>
+        <div id="list" style="margin-top:30px;"></div>
+    </div>
+
+    <script>
+        // Temporary access password
+        if(prompt("Admin Password:") === "master123") {
+            document.getElementById('admin-body').style.display = "block";
+        }
+
+        async function create() {
+            const name = document.getElementById('clientName').value;
+            const key = "sk_live_" + Math.random().toString(36).substr(2, 14);
+            // In the next step, we will connect this to your Supabase table
+            alert("Key Generated for " + name + ": " + key);
+            document.getElementById('list').innerHTML += `<div class="key-row"><span>${name}</span><span style="color:#00dfd8">${key}</span></div>`;
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Firewall | Enterprise Privacy Gateway</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --primary: #0070f3; --bg: #000; --card: #111; --text: #fff; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin:0; display: flex; height: 100vh; }
+        .sidebar { width: 260px; background: var(--card); border-right: 1px solid #222; padding: 30px; }
+        .main { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #222; }
+        .chat-area { flex: 1; background: #050505; border: 1px solid #222; border-radius: 15px; display: flex; flex-direction: column; }
+        #messages { flex: 1; padding: 20px; overflow-y: auto; }
+        .input-group { padding: 20px; border-top: 1px solid #222; display: flex; gap: 10px; }
+        input { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; }
+        button { background: var(--primary); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .redacted { color: #00dfd8; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>🛡️ AI Shield</h2>
+        <p style="color: #666; font-size: 0.8rem;">V2.0 Corporate Edition</p>
+        <nav style="margin-top: 50px; display: flex; flex-direction: column; gap: 15px;">
+            <a href="#" style="color: var(--primary); text-decoration: none;">📊 Analytics</a>
+            <a href="#" style="color: #888; text-decoration: none;">🔑 API Keys</a>
+            <a href="#" style="color: #888; text-decoration: none;">📜 Audit Logs</a>
+        </nav>
+        <button onclick="exportAudit()" style="margin-top: auto; background: #222; width: 100%;">Download Audit PDF</button>
+    </div>
+
+    <div class="main">
+        <div class="stat-grid">
+            <div class="stat-card"><h3>Blocked PII</h3><p id="pii-count" style="font-size: 2rem; color: #00dfd8;">0</p></div>
+            <div class="stat-card"><h3>Cost Saved</h3><p style="font-size: 2rem;">$12.40</p></div>
+            <div class="stat-card"><h3>Status</h3><p style="color: #27ae60;">● Secure</p></div>
+        </div>
+
+        <div class="chat-area">
+            <div id="messages"></div>
+            <div class="input-group">
+                <input type="text" id="userInput" placeholder="Type message... (try sending an email or phone)">
+                <button onclick="sendMessage()">Secure Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let piiFound = 0;
+        function scrub(text) {
+            const rules = {
+                EMAIL: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+                PHONE: /\+?\d{10,15}/g,
+                CREDIT_CARD: /\b(?:\d[ -]*?){13,16}\b/g
+            };
+            let clean = text; let hit = false;
+            for(let [type, reg] of Object.entries(rules)) {
+                if(reg.test(clean)) {
+                    clean = clean.replace(reg, `[REDACTED_${type}]`);
+                    hit = true; piiFound++;
+                }
+            }
+            return { clean, hit };
+        }
+
+        async function sendMessage() {
+            const inp = document.getElementById('userInput');
+            const msgDiv = document.getElementById('messages');
+            const { clean, hit } = scrub(inp.value);
+
+            msgDiv.innerHTML += `<div><b>User:</b> ${inp.value}</div>`;
+            if(hit) {
+                msgDiv.innerHTML += `<div class="redacted">🛡️ Data Masked: Sensitive PII removed before reaching AI</div>`;
+                document.getElementById('pii-count').innerText = piiFound;
+            }
+
+            // محاكاة استدعاء الـ API (الذي سيكون في مجلد api/)
+            msgDiv.innerHTML += `<div style="color: #888;">AI: Analyzing securely...</div>`;
+            inp.value = "";
+        }
+
+        function exportAudit() {
+            alert("Generating Corporate Compliance Report (PDF)...");
+        }
+    </script>
+</body>
+  </html>
+  

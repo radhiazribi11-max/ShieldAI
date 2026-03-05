@@ -2,89 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AI Firewall | Enterprise Privacy Gateway</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShieldAI | Governance Dashboard</title>
     <style>
-        :root { --primary: #0070f3; --bg: #000; --card: #111; --text: #fff; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin:0; display: flex; height: 100vh; }
-        .sidebar { width: 260px; background: var(--card); border-right: 1px solid #222; padding: 30px; }
+        :root { --bg: #050505; --card: #0c0c0c; --primary: #0070f3; --accent: #00dfd8; --border: #1a1a1a; }
+        body { margin: 0; background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; display: flex; height: 100vh; }
+        .sidebar { width: 260px; background: var(--card); border-right: 1px solid var(--border); padding: 40px 20px; display: flex; flex-direction: column; }
         .main { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 20px; overflow-y: auto; }
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .stat-card { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #222; }
-        .chat-area { flex: 1; background: #050505; border: 1px solid #222; border-radius: 15px; display: flex; flex-direction: column; }
-        #messages { flex: 1; padding: 20px; overflow-y: auto; }
-        .input-group { padding: 20px; border-top: 1px solid #222; display: flex; gap: 10px; }
-        input { flex: 1; background: #111; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px; }
-        button { background: var(--primary); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .redacted { color: #00dfd8; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
+        .chat-container { flex: 1; background: #080808; border-radius: 20px; border: 1px solid var(--border); display: flex; flex-direction: column; }
+        #chat-flow { flex: 1; padding: 25px; overflow-y: auto; }
+        .input-box { padding: 20px; background: var(--card); display: flex; gap: 10px; border-top: 1px solid var(--border); }
+        input { flex: 1; background: #151515; border: 1px solid #222; color: white; padding: 15px; border-radius: 10px; }
+        button { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .pii-tag { color: var(--accent); font-size: 0.75rem; font-weight: bold; margin: 5px 0; }
+        #auth-overlay { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
+
+    <div id="auth-overlay">
+        <div style="text-align:center; background:var(--card); padding:40px; border-radius:20px; border:1px solid var(--border);">
+            <h2 style="color:var(--accent)">🛡️ ShieldAI Login</h2>
+            <input type="password" id="sk_key" placeholder="Enter License Key (sk_live_...)" style="width:300px; margin-bottom:15px;">
+            <button onclick="login()" style="width:100%">Verify System</button>
+        </div>
+    </div>
+
     <div class="sidebar">
-        <h2>🛡️ AI Shield</h2>
-        <p style="color: #666; font-size: 0.8rem;">V2.0 Corporate Edition</p>
-        <nav style="margin-top: 50px; display: flex; flex-direction: column; gap: 15px;">
-            <a href="#" style="color: var(--primary); text-decoration: none;">📊 Analytics</a>
-            <a href="#" style="color: #888; text-decoration: none;">🔑 API Keys</a>
-            <a href="#" style="color: #888; text-decoration: none;">📜 Audit Logs</a>
+        <h2 style="color: var(--accent);">ShieldAI</h2>
+        <div style="margin-top:20px; font-size:0.8rem; color:#666;">ENTERPRISE EDITION</div>
+        <nav style="margin-top:50px; display:flex; flex-direction:column; gap:20px;">
+            <div style="color:var(--primary)">● Real-time Firewall</div>
+            <div style="color:#444">○ API Management</div>
+            <div style="color:#444">○ Compliance Logs</div>
         </nav>
-        <button onclick="exportAudit()" style="margin-top: auto; background: #222; width: 100%;">Download Audit PDF</button>
+        <button onclick="downloadReport()" style="margin-top:auto; background:#111;">📥 Export Audit PDF</button>
     </div>
 
     <div class="main">
-        <div class="stat-grid">
-            <div class="stat-card"><h3>Blocked PII</h3><p id="pii-count" style="font-size: 2rem; color: #00dfd8;">0</p></div>
-            <div class="stat-card"><h3>Cost Saved</h3><p style="font-size: 2rem;">$12.40</p></div>
-            <div class="stat-card"><h3>Status</h3><p style="color: #27ae60;">● Secure</p></div>
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:20px;">
+            <div class="stat-card"><small>PII BLOCKED</small><div id="pii-stat" style="font-size:2rem; color:var(--accent)">0</div></div>
+            <div class="stat-card"><small>RISK SAVED</small><div style="font-size:2rem;">$4.2k</div></div>
+            <div class="stat-card"><small>POLICY</small><div style="font-size:2rem; color:#27ae60;">Active</div></div>
         </div>
 
-        <div class="chat-area">
-            <div id="messages"></div>
-            <div class="input-group">
-                <input type="text" id="userInput" placeholder="Type message... (try sending an email or phone)">
-                <button onclick="sendMessage()">Secure Send</button>
+        <div class="chat-container">
+            <div id="chat-flow"></div>
+            <div class="input-box">
+                <input type="text" id="userInput" placeholder="Type a message to test privacy filters...">
+                <button onclick="send()">SECURE SEND</button>
             </div>
         </div>
     </div>
 
     <script>
-        let piiFound = 0;
+        let piiCount = 0;
+        let license = "";
+
+        function login() {
+            const key = document.getElementById('sk_key').value;
+            if(key.startsWith('sk_live')) {
+                license = key;
+                document.getElementById('auth-overlay').style.display = 'none';
+            } else { alert("Invalid License"); }
+        }
+
         function scrub(text) {
-            const rules = {
-                EMAIL: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
-                PHONE: /\+?\d{10,15}/g,
-                CREDIT_CARD: /\b(?:\d[ -]*?){13,16}\b/g
-            };
+            const rules = { EMAIL: /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, PHONE: /\+?\d{10,15}/g };
             let clean = text; let hit = false;
             for(let [type, reg] of Object.entries(rules)) {
                 if(reg.test(clean)) {
-                    clean = clean.replace(reg, `[REDACTED_${type}]`);
-                    hit = true; piiFound++;
+                    clean = clean.replace(reg, `[HIDDEN_${type}]`);
+                    hit = true; piiCount++;
                 }
             }
             return { clean, hit };
         }
 
-        async function sendMessage() {
+        async function send() {
             const inp = document.getElementById('userInput');
-            const msgDiv = document.getElementById('messages');
+            const flow = document.getElementById('chat-flow');
             const { clean, hit } = scrub(inp.value);
 
-            msgDiv.innerHTML += `<div><b>User:</b> ${inp.value}</div>`;
+            flow.innerHTML += `<div style="text-align:right; margin-bottom:15px;">${inp.value}</div>`;
             if(hit) {
-                msgDiv.innerHTML += `<div class="redacted">🛡️ Data Masked: Sensitive PII removed before reaching AI</div>`;
-                document.getElementById('pii-count').innerText = piiFound;
+                flow.innerHTML += `<div class="pii-tag">🛡️ ShieldAI: Masked sensitive data for GDPR compliance</div>`;
+                document.getElementById('pii-stat').innerText = piiCount;
             }
 
-            // محاكاة استدعاء الـ API (الذي سيكون في مجلد api/)
-            msgDiv.innerHTML += `<div style="color: #888;">AI: Analyzing securely...</div>`;
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: clean, licenseKey: license })
+            });
+            const data = await response.json();
+            
+            flow.innerHTML += `<div style="background:#161616; padding:15px; border-radius:10px; margin-bottom:15px;">${data.reply || data.error}</div>`;
             inp.value = "";
+            flow.scrollTop = flow.scrollHeight;
         }
 
-        function exportAudit() {
-            alert("Generating Corporate Compliance Report (PDF)...");
+        function downloadReport() {
+            const text = `SHIELDAI AUDIT LOG\nDate: ${new Date()}\nBlocked Events: ${piiCount}\nStatus: Secure`;
+            const blob = new Blob([text], {type: 'text/plain'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "Audit_Report.txt"; a.click();
         }
     </script>
 </body>
-  </html>
-  
+</html>

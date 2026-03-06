@@ -2,32 +2,36 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
     
     const { prompt, licenseKey } = req.body;
-    const API_KEY = process.env.GEMINI_KEY;
+    const GROQ_KEY = process.env.GROQ_KEY;
+
+    if (!GROQ_KEY) return res.status(500).json({ error: "Groq Key Missing" });
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Authorization': `Bearer ${GROQ_KEY}`,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
+                model: "llama-3.3-70b-versatile", // موديل خارق وسريع جداً
+                messages: [
+                    { role: "system", content: "You are ShieldAI, a secure and professional AI assistant." },
+                    { role: "user", content: prompt }
+                ]
             })
         });
 
         const data = await response.json();
 
         if (data.error) {
-            // سيعطيك جوجل هنا الرمز الدقيق للخطأ (مثل 403 أو 429)
-            return res.status(data.error.code || 500).json({ 
-                error: "ShieldAI Engine Error", 
-                message: data.error.message,
-                status: data.error.status 
-            });
+            return res.status(500).json({ error: "Groq API Error", details: data.error.message });
         }
 
-        const reply = data.candidates[0].content.parts[0].text;
+        const reply = data.choices[0].message.content;
         return res.status(200).json({ reply });
 
     } catch (err) {
-        return res.status(500).json({ error: "Critical Gateway Failure" });
+        return res.status(500).json({ error: "Groq Connection Failed" });
     }
 }

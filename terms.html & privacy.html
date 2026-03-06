@@ -1,31 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security & Privacy | ShieldAI</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #050a18; color: #e2e8f0; line-height: 1.6; }
+        .security-node { border-left: 2px solid #38bdf8; padding-left: 20px; margin-bottom: 40px; }
+    </style>
 </head>
-<body class="bg-[#050a18] text-slate-300 p-10 leading-relaxed font-sans">
+<body class="p-8 md:p-24">
     <div class="max-w-3xl mx-auto">
-        <h1 class="text-4xl font-black text-white mb-8 italic">Privacy & <span class="text-sky-400">Data Protection</span></h1>
+        <h1 class="text-5xl font-black text-white mb-12 italic">Security <span class="text-sky-400">First.</span></h1>
         
-        <section class="mb-10">
-            <h2 class="text-sky-400 font-bold text-xl mb-4">1. Zero-Retention Policy</h2>
-            <p class="text-sm">ShieldAI does NOT store your prompts, AI responses, or any personal data processed through our Gateway. We act as a "pass-through" layer only.</p>
-        </section>
+        <div class="security-node">
+            <h2 class="text-xl font-bold text-sky-400 mb-2 underline">01. Zero Data Retention</h2>
+            <p class="text-slate-400 text-sm">We act as a transparent proxy. Your data is processed in RAM and never written to a disk or database. Once the session ends, the data is gone forever.</p>
+        </div>
 
-        <section class="mb-10">
-            <h2 class="text-sky-400 font-bold text-xl mb-4">2. Local PII Scrubbing</h2>
-            <p class="text-sm">Our redaction logic (PII Scrubbing) occurs before data reaches any Large Language Model (LLM). Sensitive identifiers like Emails and API Keys are masked at the edge.</p>
-        </section>
+        <div class="security-node">
+            <h2 class="text-xl font-bold text-sky-400 mb-2 underline">02. Local PII Scrubbing</h2>
+            <p class="text-slate-400 text-sm">Our redaction engine identifies sensitive patterns (PII) before the data leaves our secure gateway, ensuring that Third-Party AI models never see your secrets.</p>
+        </div>
 
-        <section class="mb-10">
-            <h2 class="text-sky-400 font-bold text-xl mb-4">3. Data Encryption</h2>
-            <p class="text-sm">All communications between your browser and ShieldAI are encrypted using industry-standard TLS 1.3/AES-256 protocols.</p>
-        </section>
+        <div class="security-node">
+            <h2 class="text-xl font-bold text-sky-400 mb-2 underline">03. Compliance Ready</h2>
+            <p class="text-slate-400 text-sm">ShieldAI is designed to help companies meet GDPR, HIPAA, and SOC2 requirements by preventing unauthorized data sharing with AI providers.</p>
+        </div>
 
-        <footer class="mt-20 pt-10 border-t border-slate-800 text-[10px] text-slate-600">
-            Last Updated: March 2026 | ShieldAI Enterprise Compliance Team
+        <footer class="mt-20 pt-10 border-t border-slate-800 text-[10px] text-slate-600 uppercase tracking-widest text-center">
+            Updated: March 2026 | ShieldAI Enterprise Security Team
         </footer>
     </div>
 </body>
 </html>
-

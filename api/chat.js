@@ -3,46 +3,42 @@ export default async function handler(req, res) {
 
     const { prompt, licenseKey } = req.body;
 
-    // 1. الدخول (المدير أو العميل)
+    // 1. الدخول السريع للمدير
     if (licenseKey !== 'admin123' && !licenseKey.startsWith('sk_')) {
         return res.status(401).json({ error: 'Unauthorized Access' });
     }
 
-    // المفتاح المباشر الخاص بك
     const DIRECT_KEY = "AIzaSyCUB1xypsL0-5Ty0B-BPyUPwspWFa-QmFw";
+    
+    // سنحاول استخدام الموديل الأكثر استقراراً أولاً لكسر العقدة
+    const MODEL_NAME = "gemini-1.5-pro"; 
 
     try {
-        // استخدام gemini-1.5-flash-latest لضمان التوافق مع v1beta
-        const aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${DIRECT_KEY}`, {
+        const aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${DIRECT_KEY}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: prompt }]
-                }]
+                contents: [{ parts: [{ text: prompt }] }]
             })
         });
 
         const data = await aiRes.json();
 
-        // فحص الأخطاء الواردة من Google
         if (data.error) {
+            // رسالة تشخيصية دقيقة جداً إذا فشل
             return res.status(500).json({ 
-                error: `Google API Error: ${data.error.message}` 
+                error: `Google Diagnostic: ${data.error.message}. Tip: Try creating a NEW API Key in Google AI Studio.` 
             });
         }
 
-        // استخراج الرد
-        if (data.candidates && data.candidates.length > 0) {
+        if (data.candidates && data.candidates[0].content) {
             const reply = data.candidates[0].content.parts[0].text;
             res.status(200).json({ reply });
         } else {
-            res.status(500).json({ error: "No response from AI. Check your safety settings or prompt." });
+            res.status(500).json({ error: "AI logic error: No candidates returned." });
         }
 
     } catch (err) {
-        res.status(500).json({ error: 'ShieldAI Gateway: Connection Failed' });
+        res.status(500).json({ error: 'Critical Connection Failure' });
     }
 }

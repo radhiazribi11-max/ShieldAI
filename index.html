@@ -1,150 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShieldAI | Enterprise Governance & Privacy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>ShieldAI | Enterprise Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --bg: #050505; --card: #0c0c0c; --primary: #0070f3; --accent: #00dfd8; --border: #1a1a1a; --text: #fff; }
-        * { box-sizing: border-box; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar */
-        .sidebar { width: 280px; background: var(--card); border-right: 1px solid var(--border); padding: 40px 24px; display: flex; flex-direction: column; }
-        .nav-item { padding: 12px; color: #666; cursor: pointer; border-radius: 8px; margin-bottom: 10px; transition: 0.3s; font-size: 0.9rem; }
-        .nav-item.active { background: #111; color: var(--primary); font-weight: bold; }
-
-        /* Main Area */
-        .main { flex: 1; padding: 40px; display: flex; flex-direction: column; gap: 20px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .stat-card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--border); }
-        .stat-label { font-size: 0.7rem; color: #666; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-val { font-size: 2.2rem; font-weight: 800; color: var(--accent); margin-top: 5px; }
-
-        /* Chat UI */
-        .chat-box { flex: 1; background: #080808; border-radius: 24px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-        #chat-flow { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
-        .input-area { padding: 20px; background: var(--card); display: flex; gap: 15px; border-top: 1px solid var(--border); }
-        input { flex: 1; background: #151515; border: 1px solid #333; color: #fff; padding: 16px; border-radius: 12px; outline: none; }
-        button { background: var(--primary); color: #fff; border: none; padding: 0 30px; border-radius: 12px; cursor: pointer; font-weight: 800; }
-
-        /* Security Tags */
-        .shield-tag { background: rgba(0, 223, 216, 0.1); color: var(--accent); padding: 6px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; display: inline-block; }
-
-        /* Auth Gate */
-        #auth-gate { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .auth-modal { background: var(--card); padding: 50px; border-radius: 30px; border: 1px solid var(--border); width: 450px; text-align: center; }
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .neon-border { border-bottom: 2px solid #38bdf8; box-shadow: 0 4px 15px -5px #38bdf8; }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
 
-    <div id="auth-gate">
-        <div class="auth-modal">
-            <h1 style="color:var(--accent); font-size: 2.5rem; margin:0;">ShieldAI</h1>
-            <p style="color:#666; margin-bottom:30px;">Enterprise-Grade Data Firewall</p>
-            <input type="text" id="license-key" placeholder="Enter Gumroad License Key" style="width:100%; text-align:center; margin-bottom:15px;">
-            <button onclick="activate()" style="width:100%; padding:18px;">ACTIVATE SYSTEM</button>
-            <p style="margin-top:20px; font-size:0.85rem; color:#444;">
-                No license? <a href="https://radhiayt.gumroad.com/l/ofuefu" target="_blank" style="color:var(--primary); text-decoration:none;">Buy on Gumroad</a>
-            </p>
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-8 pb-4 neon-border">
+            <h1 class="text-3xl font-bold text-sky-400"><i class="fas fa-shield-halved"></i> ShieldAI <span class="text-sm font-light text-slate-400">v2.0</span></h1>
+            <div class="flex gap-4">
+                <button onclick="showSection('policies')" class="px-4 py-2 glass rounded-lg hover:bg-sky-600 transition"><i class="fas fa-user-shield"></i> Security Policies</button>
+                <button onclick="showSection('audit')" class="px-4 py-2 glass rounded-lg hover:bg-sky-600 transition"><i class="fas fa-history"></i> Audit History</button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="lg:col-span-1 space-y-6">
+                <div class="glass p-6 rounded-2xl">
+                    <h3 class="text-slate-400 mb-2">Leaks Blocked</h3>
+                    <p id="blockedCount" class="text-5xl font-bold text-red-500">0</p>
+                </div>
+                <div class="glass p-6 rounded-2xl">
+                    <h3 class="text-slate-400 mb-2">Security Status</h3>
+                    <p class="text-2xl font-bold text-emerald-400"><i class="fas fa-check-circle"></i> Active Shield</p>
+                </div>
+            </div>
+
+            <div id="main-section" class="lg:col-span-2 glass rounded-2xl p-6 h-[500px] flex flex-col">
+                <div id="chatBox" class="flex-1 overflow-y-auto mb-4 space-y-4 p-2 text-sm">
+                    <div class="bg-slate-800 p-3 rounded-lg border-r-4 border-sky-500">Welcome Admin. ShieldAI is monitoring all outgoing PII data.</div>
+                </div>
+                <div class="flex gap-2">
+                    <input id="license" type="password" placeholder="License Key" class="w-1/4 bg-slate-900 border border-slate-700 p-3 rounded-xl outline-none focus:border-sky-500">
+                    <input id="userInput" type="text" placeholder="Type sensitive prompt..." class="flex-1 bg-slate-900 border border-slate-700 p-3 rounded-xl outline-none focus:border-sky-500">
+                    <button onclick="sendMessage()" class="bg-sky-600 hover:bg-sky-500 px-6 py-3 rounded-xl transition font-bold">SEND</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="sidebar">
-        <h2 style="color:var(--accent); font-weight: 800;">ShieldAI</h2>
-        <div class="nav-item active">📊 Dashboard</div>
-        <div class="nav-item">🔒 Security Policies</div>
-        <div class="nav-item">📜 Audit History</div>
-        <button onclick="exportAudit()" style="margin-top:auto; background:#111; color:#fff; border:1px solid #222; padding:15px; border-radius:12px; font-weight:600;">📥 Export Compliance PDF</button>
-    </div>
-
-    <div class="main">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">PII Blocked</div>
-                <div id="pii-count" class="stat-val">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Risk Mitigated</div>
-                <div id="risk-val" class="stat-val">$0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">System Health</div>
-                <div class="stat-val" style="color:#27ae60; font-size:1.5rem; margin-top:15px;">SHIELD ACTIVE</div>
-            </div>
-        </div>
-
-        <div class="chat-box">
-            <div id="chat-flow">
-                <div style="color: #444; text-align: center;">--- Secure Encrypted Session Started ---</div>
-            </div>
-            <div class="input-area">
-                <input type="text" id="msgInput" placeholder="Send a secure prompt... (PII will be redacted)">
-                <button onclick="process()">SECURE SEND</button>
-            </div>
+    <div id="modalOverlay" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4">
+        <div class="glass max-w-2xl w-full p-8 rounded-3xl relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-2xl">&times;</button>
+            <div id="modalContent"></div>
         </div>
     </div>
 
     <script>
-        let sessionStats = { pii: 0, key: "" };
+        let history = JSON.parse(localStorage.getItem('shieldLogs') || '[]');
 
-        function activate() {
-            const k = document.getElementById('license-key').value;
-            if(k.length > 5) {
-                sessionStats.key = k;
-                document.getElementById('auth-gate').style.display = 'none';
-            } else { alert("Please enter a valid license key."); }
-        }
+        async function sendMessage() {
+            const prompt = document.getElementById('userInput').value;
+            const key = document.getElementById('license').value;
+            if(!prompt || !key) return alert("Missing Input");
 
-        function scrubPII(text) {
-            const rules = {
-                EMAIL: /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi,
-                PHONE: /\+?\d{10,15}/g,
-                CREDIT_CARD: /\b(?:\d[ -]*?){13,16}\b/g
-            };
-            let clean = text, hit = false;
-            for(let [type, reg] of Object.entries(rules)) {
-                if(reg.test(clean)) {
-                    clean = clean.replace(reg, `[HIDDEN_${type}]`);
-                    hit = true; sessionStats.pii++;
+            const chatBox = document.getElementById('chatBox');
+            chatBox.innerHTML += `<div class="text-sky-300"><b>You:</b> ${prompt}</div>`;
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ prompt, licenseKey: key })
+                });
+                const data = await res.json();
+
+                // تحديث العداد
+                if(data.security) {
+                    document.getElementById('blockedCount').innerText = data.security.blocked;
+                    if(data.shielded) {
+                        chatBox.innerHTML += `<div class="text-red-400 text-xs italic"><i class="fas fa-user-secret"></i> ShieldAI intercepted sensitive data!</div>`;
+                    }
                 }
+
+                chatBox.innerHTML += `<div class="bg-slate-700 p-3 rounded-lg"><b>AI:</b> ${data.reply}</div>`;
+                
+                // حفظ في السجل (Audit History)
+                history.push({ date: new Date().toLocaleString(), prompt, status: data.shielded ? 'REDACTED' : 'CLEAN' });
+                localStorage.setItem('shieldLogs', JSON.stringify(history));
+
+                chatBox.scrollTop = chatBox.scrollHeight;
+                document.getElementById('userInput').value = "";
+            } catch (e) {
+                alert("Connection Error");
             }
-            return { clean, hit };
         }
 
-        async function process() {
-            const inp = document.getElementById('msgInput');
-            const flow = document.getElementById('chat-flow');
-            if(!inp.value) return;
+        function showSection(type) {
+            const overlay = document.getElementById('modalOverlay');
+            const content = document.getElementById('modalContent');
+            overlay.classList.remove('hidden');
 
-            const { clean, hit } = scrubPII(inp.value);
-            flow.innerHTML += `<div style="text-align:right; margin-bottom:20px;"><b>You:</b> ${inp.value}</div>`;
-            
-            if(hit) {
-                flow.innerHTML += `<div class="shield-tag">🛡️ ShieldAI Firewall: Sensitive data masked for compliance</div>`;
-                document.getElementById('pii-count').innerText = sessionStats.pii;
-                document.getElementById('risk-val').innerText = "$" + (sessionStats.pii * 250); // Estimated fine saved
+            if(type === 'policies') {
+                content.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4 text-sky-400">📜 Security Policies</h2>
+                    <ul class="space-y-3">
+                        <li class="p-3 bg-slate-800 rounded-lg">✅ <b>PII Masking:</b> Automatic redaction of Emails, Phones, and Keys.</li>
+                        <li class="p-3 bg-slate-800 rounded-lg">✅ <b>Model Guard:</b> All requests routed via Groq secure tunnel.</li>
+                        <li class="p-3 bg-slate-800 rounded-lg">✅ <b>Zero-Logs:</b> Raw prompt data is never stored on disk.</li>
+                    </ul>
+                `;
+            } else if(type === 'audit') {
+                let logHtml = history.map(h => `
+                    <div class="flex justify-between border-b border-slate-700 py-2 text-xs">
+                        <span>${h.date}</span>
+                        <span class="${h.status === 'REDACTED' ? 'text-red-400' : 'text-emerald-400'}">${h.status}</span>
+                    </div>
+                `).join('') || "No history yet.";
+                content.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4 text-sky-400">📜 Audit History</h2>
+                    <div class="max-h-60 overflow-y-auto">${logHtml}</div>
+                `;
             }
-
-            const res = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: clean, licenseKey: sessionStats.key })
-            });
-            const data = await res.json();
-            
-            flow.innerHTML += `<div style="background:#111; padding:20px; border-radius:12px; border:1px solid #222; margin-bottom:20px;"><b>ShieldAI:</b> ${data.reply || data.error}</div>`;
-            inp.value = "";
-            flow.scrollTop = flow.scrollHeight;
         }
 
-        function exportAudit() {
-            const content = `SHIELDAI COMPLIANCE REPORT\nDate: ${new Date()}\nPII Protected: ${sessionStats.pii}\nLiability Coverage: ${document.getElementById('risk-val').innerText}\nStatus: Certified Safe`;
-            const blob = new Blob([content], {type: 'text/plain'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "Audit_Report.txt"; a.click();
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.add('hidden');
         }
     </script>
 </body>

@@ -8,10 +8,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0f172a; color: #f1f5f9; }
+        body { background-color: #0f172a; color: #f1f5f9; font-family: 'Inter', sans-serif; }
         .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .typing-indicator { font-style: italic; font-size: 0.8rem; color: #94a3b8; }
     </style>
 </head>
 <body class="antialiased">
@@ -19,13 +20,13 @@
     <nav class="border-b border-slate-800 p-4 bg-slate-900/80 sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
                     <i class="fas fa-shield-alt text-white"></i>
                 </div>
                 <h1 class="text-xl font-bold tracking-tight text-white">Shield<span class="text-blue-500">AI</span></h1>
             </div>
             <div id="user-info" class="text-[10px] font-mono text-slate-400 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 uppercase tracking-widest">
-                SYNCING...
+                INITIALIZING...
             </div>
         </div>
     </nav>
@@ -46,19 +47,22 @@
             </div>
         </div>
 
-        <div class="glass-panel rounded-3xl overflow-hidden flex flex-col h-[500px] shadow-2xl relative">
+        <div class="glass-panel rounded-3xl overflow-hidden flex flex-col h-[550px] shadow-2xl relative">
             <div id="chat-box" class="flex-1 p-6 overflow-y-auto space-y-4 custom-scrollbar">
                 <div class="bg-blue-600/10 border border-blue-500/20 p-4 rounded-2xl text-blue-200 text-sm max-w-[85%]">
+                    <i class="fas fa-check-circle mr-2 text-blue-500"></i>
                     Secure channel established. Ready for shielded analysis.
                 </div>
             </div>
 
             <div class="p-4 bg-slate-900/60 border-t border-slate-700">
                 <div class="flex gap-3">
-                    <input id="user-input" type="text" onkeypress="if(event.key === 'Enter') sendMessage()"
+                    <input id="user-input" type="text" 
+                        onkeypress="if(event.key === 'Enter') sendMessage()"
                         placeholder="Type your secure prompt..." 
-                        class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm">
-                    <button id="send-btn" onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 active:scale-95 transition-all">
+                        class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-white text-sm transition-all">
+                    <button id="send-btn" onclick="sendMessage()" 
+                        class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-blue-600/20">
                         <span>SEND</span>
                         <i class="fas fa-paper-plane text-[10px]"></i>
                     </button>
@@ -68,13 +72,15 @@
     </main>
 
     <script>
-        // التكوين باستخدام مفاتيحك التي أرسلتها
+        // التكوين
         const supabaseUrl = 'https://xjjuvagvfaocvszztkgh.supabase.co';
         const supabaseKey = 'sb_publishable_vhoqtLU78J0jm5vVb5P0Jg_OFMXQ4Fl'; 
         const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
         
+        // المفتاح الافتراضي (تأكد أن هذا موجود في جدولك)
         let licenseKey = localStorage.getItem('shield_key') || 'admin123';
 
+        // دالة جلب البيانات لتحديث العدادات
         async function loadUserData() {
             try {
                 const { data, error } = await _supabase
@@ -86,12 +92,18 @@
                 if (data) {
                     document.getElementById('usage-count').innerText = data.usage_count.toLocaleString();
                     document.getElementById('max-limit').innerText = data.max_limit.toLocaleString();
-                    document.getElementById('remaining').innerText = (data.max_limit - data.usage_count).toLocaleString();
-                    document.getElementById('user-info').innerText = data.email || 'CONNECTED';
+                    const rem = data.max_limit - data.usage_count;
+                    document.getElementById('remaining').innerText = rem.toLocaleString();
+                    document.getElementById('user-info').innerText = `LICENSE: ${licenseKey} | ACTIVE`;
+                } else {
+                    document.getElementById('user-info').innerText = "INVALID LICENSE";
                 }
-            } catch (err) { console.log("Sync Error"); }
+            } catch (err) { 
+                console.error("Sync Error"); 
+            }
         }
 
+        // دالة إرسال الرسائل
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const chatBox = document.getElementById('chat-box');
@@ -100,12 +112,20 @@
 
             if (!prompt) return;
 
+            // 1. واجهة المستخدم - إضافة رسالة العميل
             sendBtn.disabled = true;
-            chatBox.innerHTML += `<div class="flex justify-end"><div class="bg-slate-700 p-3 rounded-2xl rounded-tr-none text-sm border border-slate-600">${prompt}</div></div>`;
+            chatBox.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="bg-slate-700 p-3 rounded-2xl rounded-tr-none text-sm border border-slate-600 shadow-sm">
+                        ${prompt}
+                    </div>
+                </div>`;
+            
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
+                // 2. طلب السيرفر
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -113,15 +133,27 @@
                 });
 
                 const result = await response.json();
-                if (!response.ok) throw new Error(result.error);
+                
+                if (!response.ok) throw new Error(result.error || result.reply);
 
-                chatBox.innerHTML += `<div class="flex justify-start"><div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl rounded-tl-none text-emerald-50 text-sm">${result.reply}</div></div>`;
+                // 3. واجهة المستخدم - إضافة رد الـ AI
+                chatBox.innerHTML += `
+                    <div class="flex justify-start animate-fade-in">
+                        <div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl rounded-tl-none text-emerald-50 text-sm shadow-sm">
+                            <i class="fas fa-robot mr-2 text-emerald-500"></i>
+                            ${result.reply}
+                        </div>
+                    </div>`;
             } catch (err) {
-                chatBox.innerHTML += `<div class="bg-red-500/10 p-3 rounded-xl text-red-400 text-xs text-center border border-red-500/20">Error: ${err.message}</div>`;
+                chatBox.innerHTML += `
+                    <div class="bg-red-500/10 p-3 rounded-xl text-red-400 text-xs text-center border border-red-500/20">
+                        <i class="fas fa-exclamation-triangle mr-2"></i> Error: ${err.message}
+                    </div>`;
             } finally {
                 sendBtn.disabled = false;
                 chatBox.scrollTop = chatBox.scrollHeight;
-                setTimeout(loadUserData, 1000); // تحديث الأرقام بعد ثانية واحدة
+                // تحديث العداد بعد الإرسال
+                setTimeout(loadUserData, 500);
             }
         }
 

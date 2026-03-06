@@ -1,7 +1,7 @@
 {
-  "name": "shieldai-enterprise",
+  "name": "shield-ai",
   "version": "1.0.0",
-  "engines": {
-    "node": "24.x"
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
   }
 }

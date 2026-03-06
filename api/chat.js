@@ -6,16 +6,20 @@ export default async function handler(req, res) {
 
   const { prompt, licenseKey } = req.body;
 
-  if (!licenseKey || (!licenseKey.startsWith("sk_") && licenseKey !== "admin123")) {
-    return res.status(401).json({ error: "Unauthorized Access" });
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt required" });
   }
 
-  const API_KEY = process.env.GEMINI_KEY;
+  if (!licenseKey || !licenseKey.startsWith("sk_")) {
+    return res.status(401).json({ error: "Invalid license" });
+  }
+
+  const GEMINI = process.env.GEMINI_KEY;
 
   try {
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI}`,
       {
         method: "POST",
         headers: {
@@ -25,7 +29,9 @@ export default async function handler(req, res) {
           contents: [
             {
               parts: [
-                { text: prompt }
+                {
+                  text: prompt
+                }
               ]
             }
           ]
@@ -36,23 +42,21 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     if (data.error) {
-      return res.status(500).json({
-        error: "Google API Error",
-        details: data.error.message
-      });
+      return res.status(500).json({ error: data.error.message });
     }
 
     const reply =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      data.candidates?.[0]?.content?.parts?.[0]?.text ||
       "AI returned empty response";
 
-    return res.status(200).json({ reply });
+    res.status(200).json({ reply });
 
-  } catch (error) {
-    return res.status(500).json({
-      error: "ShieldAI Gateway Failure",
-      details: error.message
+  } catch (err) {
+
+    res.status(500).json({
+      error: "AI Gateway Failed"
     });
+
   }
 
-        }
+                             }

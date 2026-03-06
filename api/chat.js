@@ -3,29 +3,34 @@ export default async function handler(req, res) {
 
     const { prompt, licenseKey } = req.body;
 
-    if (!licenseKey) {
-        return res.status(401).json({ error: 'License Key Required' });
+    // 1. نظام التحقق المزدوج (العملاء + المدير)
+    let isValid = false;
+
+    if (licenseKey === 'admin123') {
+        isValid = true; // السماح لك بالتجربة كمدير
+    } else {
+        try {
+            const gumroadRes = await fetch(`https://api.gumroad.com/v2/licenses/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    product_permalink: 'ofuefu', 
+                    license_key: licenseKey
+                })
+            });
+            const gumData = await gumroadRes.json();
+            if (gumData.success) isValid = true;
+        } catch (err) {
+            console.error("Gumroad Error");
+        }
     }
 
+    if (!isValid) {
+        return res.status(401).json({ error: 'Invalid or Expired Enterprise License' });
+    }
+
+    // 2. الاتصال بـ Gemini (تأكد أن GEMINI_KEY موجود في Vercel)
     try {
-        // 1. Verify License with Gumroad API
-        const gumroadRes = await fetch(`https://api.gumroad.com/v2/licenses/verify`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: new URLSearchParams({
-                product_permalink: 'ofuefu', // Your product ID from radhiayt.gumroad.com/l/ofuefu
-                license_key: licenseKey
-            })
-        });
-        
-        const gumData = await gumroadRes.json();
-
-        // Check if the license is valid and not over-used
-        if (!gumData.success || gumData.uses > 50) {
-            return res.status(401).json({ error: 'Invalid or Expired Enterprise License' });
-        }
-
-        // 2. Call Gemini AI via Server-side Key (GEMINI_KEY must be in Vercel Settings)
         const aiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -35,14 +40,15 @@ export default async function handler(req, res) {
         });
 
         const data = await aiRes.json();
-        const reply = data.candidates[0].content.parts[0].text;
+        
+        if (data.error) {
+            return res.status(500).json({ error: 'AI Key Error: Please check your GEMINI_KEY in Vercel settings.' });
+        }
 
-        res.status(200).json({ 
-            reply, 
-            customer: gumData.purchase.email 
-        });
+        const reply = data.candidates[0].content.parts[0].text;
+        res.status(200).json({ reply });
 
     } catch (err) {
-        res.status(500).json({ error: 'ShieldAI Gateway Error: Check GEMINI_KEY in Vercel' });
+        res.status(500).json({ error: 'Gateway Error' });
     }
 }

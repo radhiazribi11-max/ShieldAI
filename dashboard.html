@@ -3,101 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShieldAI | Secure Dashboard</title>
+    <title>ShieldAI | Secure Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body { background-color: #050a18; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(56, 189, 248, 0.1); }
-    </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-5xl mx-auto">
-        <header class="flex justify-between items-center mb-10 pb-4 border-b border-sky-500/20">
-            <div class="text-2xl font-black text-white italic">🛡️ SHIELD<span class="text-sky-400">AI</span></div>
-            <button onclick="window.location.href='index.html'" class="text-[10px] bg-slate-800 px-6 py-2 rounded-full border border-slate-700 font-bold hover:bg-red-900/20 transition-colors uppercase">Logout</button>
-        </header>
+<body class="bg-gray-900 text-white font-sans">
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
-            <div class="glass-card p-5 rounded-3xl">
-                <span class="text-slate-500 text-[9px] uppercase block mb-2 font-bold tracking-widest">Leaks Intercepted</span>
-                <span id="blockedCount" class="text-3xl font-black text-red-500 italic">0</span>
+    <nav class="border-b border-gray-800 p-4 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">ShieldAI</h1>
+            <div id="user-info" class="text-sm text-gray-400">Loading account data...</div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-6 space-y-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
+                <p class="text-gray-400 text-sm">Total Request Limit</p>
+                <h3 id="max-limit" class="text-3xl font-bold mt-2 text-white">5,000</h3>
             </div>
-            <div class="glass-card p-5 rounded-3xl">
-                <span class="text-slate-500 text-[9px] uppercase block mb-2 font-bold tracking-widest">Available Credits</span>
-                <span id="usageStatus" class="text-2xl font-black text-sky-400 italic">---</span>
+            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl border-l-4 border-l-blue-500">
+                <p class="text-gray-400 text-sm">Used Requests</p>
+                <h3 id="usage-count" class="text-3xl font-bold mt-2 text-blue-400">0</h3>
             </div>
-            <div class="glass-card p-5 rounded-3xl">
-                <span class="text-slate-500 text-[9px] uppercase block mb-2 font-bold tracking-widest">Plan Type</span>
-                <span id="planType" class="text-[10px] bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full font-bold uppercase">Free Tier</span>
-            </div>
-            <div class="glass-card p-5 rounded-3xl flex items-center justify-center">
-                <button onclick="downloadPDF()" class="text-sky-400 text-[10px] font-black uppercase hover:underline"><i class="fas fa-download mr-1"></i> Audit Report</button>
+            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl border-l-4 border-l-emerald-500">
+                <p class="text-gray-400 text-sm">Remaining Credits</p>
+                <h3 id="remaining" class="text-3xl font-bold mt-2 text-emerald-400">---</h3>
             </div>
         </div>
 
-        <div class="glass-card rounded-[40px] p-6 h-[65vh] flex flex-col shadow-2xl">
-            <div id="chatBox" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-4 custom-scroll">
-                <div class="text-center text-[10px] text-sky-500/50 italic py-2 border-b border-sky-500/5 mb-4 uppercase tracking-[0.2em]">Secure Session Established - AES 256</div>
+        <div class="bg-gray-800 rounded-3xl border border-gray-700 overflow-hidden flex flex-col h-[550px] shadow-2xl">
+            <div class="bg-gray-700/30 p-4 border-b border-gray-700 flex justify-between items-center">
+                <span class="flex items-center gap-2 text-sm font-medium">
+                    <i class="fas fa-user-shield text-emerald-400"></i> Privacy Shield Active
+                </span>
+                <span class="text-[10px] uppercase tracking-widest bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20 font-bold">
+                    Zero Storage Policy
+                </span>
             </div>
-            <div class="pt-4 border-t border-slate-800 space-y-4">
-                <input id="license" type="password" placeholder="License Key (sk_...)" class="w-full bg-slate-950 border border-slate-800 p-3 rounded-xl text-xs outline-none focus:border-sky-500 transition-all">
-                <div class="flex gap-2">
-                    <input id="userInput" type="text" placeholder="Type your secure prompt..." class="flex-1 bg-slate-950 border border-slate-800 px-5 py-3 rounded-xl text-xs outline-none focus:border-sky-500 transition-all">
-                    <button onclick="sendMessage()" class="bg-sky-600 hover:bg-sky-500 px-8 rounded-xl transition-all shadow-lg shadow-sky-900/40"><i class="fas fa-paper-plane"></i></button>
+            
+            <div id="chat-box" class="flex-1 p-6 overflow-y-auto space-y-4 text-sm scrollbar-thin scrollbar-thumb-gray-600">
+                <div class="bg-blue-500/10 border border-blue-500/20 p-4 rounded-2xl text-blue-200">
+                    <i class="fas fa-info-circle mr-2"></i> Welcome! Enter any text below. <strong>ShieldAI</strong> will automatically redact PII (Emails, Phones) before processing your request.
+                </div>
+            </div>
+
+            <div class="p-4 bg-gray-900/40 border-t border-gray-700">
+                <div class="flex gap-4">
+                    <input id="user-input" type="text" placeholder="Type your message (e.g., Send email to john@example.com)..." 
+                        class="flex-1 bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-all text-sm">
+                    <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2">
+                        <span>Send</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
         </div>
-    </div>
-
-    <script type="text/javascript">
-      window.$crisp=[]; window.CRISP_WEBSITE_ID="525c7845-cadb-44e2-96b3-ae84e645661b";
-      (function(){ d=document; s=d.createElement("script"); s.src="https://client.crisp.chat/l.js"; s.async=1; d.getElementsByTagName("head")[0].appendChild(s); })();
-    </script>
+    </main>
 
     <script>
-        let auditLogs = [];
+        // Use the License Key from Login or fallback to Admin for testing
+        const licenseKey = localStorage.getItem('shield_key') || 'admin123';
+        
+        // Supabase Configuration
+        const supabaseUrl = 'https://xjjuvagvfaocvszztkgh.supabase.co';
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; // REPLACE WITH YOUR ACTUAL ANON KEY
+        const supabase = supabasejs.createClient(supabaseUrl, supabaseKey);
+
+        async function loadUserData() {
+            const { data, error } = await supabase
+                .from('usage_tracking')
+                .select('*')
+                .eq('license_key', licenseKey)
+                .single();
+
+            if (data) {
+                document.getElementById('usage-count').innerText = data.usage_count.toLocaleString();
+                document.getElementById('max-limit').innerText = data.max_limit.toLocaleString();
+                document.getElementById('remaining').innerText = (data.max_limit - data.usage_count).toLocaleString();
+                document.getElementById('user-info').innerText = `Active Session: ${data.email || 'Admin User'}`;
+            } else {
+                document.getElementById('user-info').innerText = "Trial Mode (No active license found)";
+            }
+        }
+
         async function sendMessage() {
-            const prompt = document.getElementById('userInput').value;
-            const key = document.getElementById('license').value;
-            if(!prompt || !key) return alert("Fill all fields.");
-            
-            const chatBox = document.getElementById('chatBox');
-            chatBox.innerHTML += `<div class="flex justify-end"><div class="max-w-[80%] bg-slate-800 p-4 rounded-2xl rounded-tr-none text-xs">User: ${prompt}</div></div>`;
+            const input = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            if(!input.value) return;
+
+            // Display User Message
+            const userMsg = input.value;
+            chatBox.innerHTML += `<div class="bg-gray-700 p-3 rounded-xl ml-auto max-w-[85%] text-right">${userMsg}</div>`;
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                const res = await fetch('/api/chat', {
+                // Call Vercel API
+                const response = await fetch('/api/chat', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ prompt, licenseKey: key })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: userMsg, licenseKey: licenseKey })
                 });
-                const data = await res.json();
-                if(data.error) return alert(data.error);
 
-                document.getElementById('usageStatus').innerText = data.usage.max - data.usage.current;
-                document.getElementById('planType').innerText = (data.usage.max > 500) ? 'PRO ACCOUNT' : 'FREE TIER';
+                const result = await response.json();
                 
-                chatBox.innerHTML += `<div class="flex justify-start mt-4"><div class="max-w-[80%] bg-sky-900/20 border border-sky-500/20 p-4 rounded-2xl rounded-tl-none text-xs text-sky-100">ShieldAI: ${data.reply}</div></div>`;
-                
-                if(data.shielded) {
-                    document.getElementById('blockedCount').innerText = parseInt(document.getElementById('blockedCount').innerText) + 1;
+                // Display ShieldAI Secure Response
+                if (result.reply) {
+                    chatBox.innerHTML += `
+                        <div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl mr-auto max-w-[85%]">
+                            <p class="text-emerald-400 font-bold mb-1"><i class="fas fa-check-circle"></i> Secure Response:</p>
+                            <p class="text-emerald-50 text-xs">${result.reply}</p>
+                        </div>
+                    `;
+                } else {
+                    throw new Error(result.error);
                 }
-
-                auditLogs.unshift({ time: new Date().toLocaleString(), status: data.shielded ? 'REDACTED' : 'CLEAN', text: prompt.substring(0, 30) + '...' });
-                chatBox.scrollTop = chatBox.scrollHeight;
-                document.getElementById('userInput').value = "";
-            } catch (e) { alert("Check Connection."); }
+            } catch (err) {
+                chatBox.innerHTML += `<div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-400 text-xs">Error: ${err.message}</div>`;
+            }
+            
+            chatBox.scrollTop = chatBox.scrollHeight;
+            loadUserData(); // Refresh stats automatically
         }
 
-        function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text("ShieldAI Security Audit", 20, 20);
-            auditLogs.forEach((l, i) => doc.text(`${l.time} - [${l.status}] - ${l.text}`, 20, 30 + (i*10)));
-            doc.save("ShieldAI-Audit.pdf");
-        }
+        // Initialize Data on load
+        loadUserData();
     </script>
 </body>
-                  </html>
-                      
+</html>

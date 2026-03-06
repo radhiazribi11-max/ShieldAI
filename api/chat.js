@@ -1,20 +1,20 @@
-const { createClient } = require('@supabase/supabase-js');
-const fetch = require('node-fetch');
+import { createClient } from "@supabase/supabase-js";
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
 
-res.setHeader('Access-Control-Allow-Origin', '*');
-res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+res.setHeader("Access-Control-Allow-Origin", "*");
+res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-if (req.method === 'OPTIONS') return res.status(200).end();
+if (req.method === "OPTIONS") {
+return res.status(200).end();
+}
+
+if (req.method !== "POST") {
+return res.status(405).json({ reply: "Method not allowed" });
+}
 
 try {
-
-const supabase = createClient(
-process.env.SUPABASE_URL,
-process.env.SUPABASE_KEY
-);
 
 const { prompt, licenseKey } = req.body;
 
@@ -22,13 +22,18 @@ if (!prompt) {
 return res.status(400).json({ reply: "Prompt missing" });
 }
 
-let { data: user } = await supabase
-.from('usage_tracking')
-.select('*')
-.eq('license_key', licenseKey)
+const supabase = createClient(
+process.env.SUPABASE_URL,
+process.env.SUPABASE_KEY
+);
+
+const { data: user, error } = await supabase
+.from("usage_tracking")
+.select("*")
+.eq("license_key", licenseKey)
 .single();
 
-if (!user) {
+if (error || !user) {
 return res.status(403).json({ reply: "Invalid license" });
 }
 
@@ -36,7 +41,7 @@ if (user.usage_count >= user.max_limit) {
 return res.status(403).json({ reply: "Credit limit reached" });
 }
 
-const groqResponse = await fetch(
+const aiResponse = await fetch(
 "https://api.groq.com/openai/v1/chat/completions",
 {
 method: "POST",
@@ -60,26 +65,20 @@ content: prompt
 }
 );
 
-const groqData = await groqResponse.json();
+const aiData = await aiResponse.json();
 
-if (!groqData.choices) {
-return res.status(500).json({
-reply: "Groq API error"
-});
+if (!aiData.choices) {
+return res.status(500).json({ reply: "Groq API error" });
 }
 
-const aiReply = groqData.choices[0].message.content;
+const aiReply = aiData.choices[0].message.content;
 
 await supabase
-.from('usage_tracking')
-.update({
-usage_count: user.usage_count + 1
-})
-.eq('license_key', licenseKey);
+.from("usage_tracking")
+.update({ usage_count: user.usage_count + 1 })
+.eq("license_key", licenseKey);
 
-return res.status(200).json({
-reply: aiReply
-});
+return res.status(200).json({ reply: aiReply });
 
 } catch (err) {
 
@@ -89,4 +88,4 @@ reply: "Server error: " + err.message
 
 }
 
-};
+  }

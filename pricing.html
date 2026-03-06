@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShieldAI | Pricing Plans</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #050a18; color: #e2e8f0; }
+        .price-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(56, 189, 248, 0.1); transition: all 0.3s ease; }
+        .price-card:hover { border-color: #38bdf8; transform: translateY(-5px); }
+        .neon-text { text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div class="max-w-5xl w-full">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-sky-400 mb-4 neon-text">اختر خطة الأمان المناسبة</h1>
+            <p class="text-slate-400">احمِ بيانات عملائك واستخدم قوة الذكاء الاصطناعي بلا خوف.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <div class="price-card p-8 rounded-3xl flex flex-col">
+                <h3 class="text-xl font-bold mb-2">الخطة المجانية</h3>
+                <div class="text-4xl font-black mb-6">$0 <span class="text-sm font-normal text-slate-500">/شهرياً</span></div>
+                <ul class="space-y-4 mb-8 flex-1 text-sm text-slate-300">
+                    <li><i class="fas fa-check text-sky-500 ml-2"></i> 100 طلب شهرياً</li>
+                    <li><i class="fas fa-check text-sky-500 ml-2"></i> حماية PII الأساسية</li>
+                    <li><i class="fas fa-check text-sky-500 ml-2"></i> سجل عمليات محدود</li>
+                </ul>
+                <a href="index.html" class="block text-center py-3 rounded-xl border border-slate-700 hover:bg-slate-800 transition">ابدأ الآن</a>
+            </div>
+
+            <div class="price-card p-8 rounded-3xl flex flex-col border-2 border-sky-500 relative transform scale-105 shadow-2xl shadow-sky-900/20">
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-sky-500 text-white px-4 py-1 rounded-full text-xs font-bold">الأكثر طلباً</div>
+                <h3 class="text-xl font-bold mb-2 text-sky-400">خطة المحترفين (PRO)</h3>
+                <div class="text-4xl font-black mb-6">$19 <span class="text-sm font-normal text-slate-500">/شهرياً</span></div>
+                <ul class="space-y-4 mb-8 flex-1 text-sm text-slate-300">
+                    <li><i class="fas fa-check text-sky-500 ml-2"></i> طلبات غير محدودة</li>
+                    <li><i class="fas fa-check text-sky-500 ml-2"></i> حماية PII متقدمة (API Keys)</li>
+                    <li><i class="fas fa-check text-sky-500 ml-2"></i> سجل Audit كامل (تصدير PDF)</li>
+                    <li><i class="fas fa-check text-sky-500 ml-2"></i> دعم فني ذو أولوية</li>
+                </ul>
+                <a href="https://radhiazribi11-max.gumroad.com/l/ofuefu" class="block text-center py-3 rounded-xl bg-sky-600 hover:bg-sky-500 font-bold shadow-lg transition">اشترك الآن</a>
+            </div>
+
+            <div class="price-card p-8 rounded-3xl flex flex-col">
+                <h3 class="text-xl font-bold mb-2">للشركات (Enterprise)</h3>
+                <div class="text-4xl font-black mb-6">اتصل بنا</div>
+                <ul class="space-y-4 mb-8 flex-1 text-sm text-slate-300">
+                    <li><i class="fas fa-check text-sky-500 ml-2"></i> وصول كامل للـ API</li>
+                    <li><i class="fas fa-check text-sky-500 ml-2"></i> استضافة خاصة (On-Premise)</li>
+                    <li><i class="fas fa-check text-sky-500 ml-2"></i> تخصيص قواعد الحماية</li>
+                </ul>
+                <button class="block text-center py-3 rounded-xl border border-slate-700 hover:bg-slate-800 transition">تواصل مع المبيعات</button>
+            </div>
+
+        </div>
+
+        <div class="text-center mt-12 text-slate-500 text-sm">
+            <a href="index.html" class="hover:text-sky-400"><i class="fas fa-arrow-right"></i> العودة للوحة التحكم</a>
+        </div>
+    </div>
+
+</body>
+</html>

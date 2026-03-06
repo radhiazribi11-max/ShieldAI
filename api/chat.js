@@ -1,91 +1,108 @@
-import { createClient } from "@supabase/supabase-js";
+const { createClient } = require('@supabase/supabase-js');
+const fetch = require('node-fetch');
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
 
-res.setHeader("Access-Control-Allow-Origin", "*");
-res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-if (req.method === "OPTIONS") {
-return res.status(200).end();
-}
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
-if (req.method !== "POST") {
-return res.status(405).json({ reply: "Method not allowed" });
-}
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-try {
+  try {
 
-const { prompt, licenseKey } = req.body;
+    const { prompt, licenseKey } = req.body;
 
-if (!prompt) {
-return res.status(400).json({ reply: "Prompt missing" });
-}
+    if (!prompt || !licenseKey) {
+      return res.status(400).json({ error: "Missing prompt or licenseKey" });
+    }
 
-const supabase = createClient(
-process.env.SUPABASE_URL,
-process.env.SUPABASE_KEY
-);
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_KEY
+    );
 
-const { data: user, error } = await supabase
-.from("usage_tracking")
-.select("*")
-.eq("license_key", licenseKey)
-.single();
+    // 1️⃣ جلب المستخدم
+    const { data: user, error } = await supabase
+      .from('usage_tracking')
+      .select('*')
+      .eq('license_key', licenseKey)
+      .single();
 
-if (error || !user) {
-return res.status(403).json({ reply: "Invalid license" });
-}
+    if (error || !user) {
+      return res.status(403).json({ error: "Invalid license key" });
+    }
 
-if (user.usage_count >= user.max_limit) {
-return res.status(403).json({ reply: "Credit limit reached" });
-}
+    if (user.usage_count >= user.max_limit) {
+      return res.status(403).json({ error: "Credits exhausted" });
+    }
 
-const aiResponse = await fetch(
-"https://api.groq.com/openai/v1/chat/completions",
-{
-method: "POST",
-headers: {
-"Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
-"Content-Type": "application/json"
-},
-body: JSON.stringify({
-model: "llama3-8b-8192",
-messages: [
-{
-role: "system",
-content: "You are ShieldAI secure assistant."
-},
-{
-role: "user",
-content: prompt
-}
-]
-})
-}
-);
+    // 2️⃣ تنظيف البيانات الحساسة
+    let cleanPrompt = prompt
+      .replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '[EMAIL]')
+      .replace(/\+?\d{8,15}/g, '[PHONE]');
 
-const aiData = await aiResponse.json();
+    // 3️⃣ طلب Groq
+    const ai = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama3-8b-8192",
+        messages: [
+          {
+            role: "system",
+            content: "You are ShieldAI secure assistant."
+          },
+          {
+            role: "user",
+            content: cleanPrompt
+          }
+        ]
+      })
+    });
 
-if (!aiData.choices) {
-return res.status(500).json({ reply: "Groq API error" });
-}
+    const aiData = await ai.json();
 
-const aiReply = aiData.choices[0].message.content;
+    if (!aiData.choices) {
+      return res.status(500).json({ error: "AI response error" });
+    }
 
-await supabase
-.from("usage_tracking")
-.update({ usage_count: user.usage_count + 1 })
-.eq("license_key", licenseKey);
+    const reply = aiData.choices[0].message.content;
 
-return res.status(200).json({ reply: aiReply });
+    // 4️⃣ تحديث الاستهلاك
+    const newUsage = user.usage_count + 1;
 
-} catch (err) {
+    await supabase
+      .from('usage_tracking')
+      .update({ usage_count: newUsage })
+      .eq('license_key', licenseKey);
 
-return res.status(500).json({
-reply: "Server error: " + err.message
-});
+    // 5️⃣ الرد
+    return res.status(200).json({
+      reply: reply,
+      usage: {
+        current: newUsage,
+        max: user.max_limit
+      }
+    });
 
-}
+  } catch (err) {
+
+    console.error("ShieldAI Error:", err);
+
+    return res.status(500).json({
+      error: "Server error"
+    });
 
   }
+
+};

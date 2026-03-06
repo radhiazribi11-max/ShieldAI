@@ -3,69 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShieldAI | Enterprise Dashboard</title>
+    <title>ShieldAI Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .neon-border { border-bottom: 2px solid #38bdf8; box-shadow: 0 4px 15px -5px #38bdf8; }
+        body { background-color: #050a18; color: #e2e8f0; }
+        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(56, 189, 248, 0.1); }
+        .audit-log-item { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 0; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="min-h-screen p-4">
 
-    <div class="max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-8 pb-4 neon-border">
-            <h1 class="text-3xl font-bold text-sky-400"><i class="fas fa-shield-halved"></i> ShieldAI <span class="text-sm font-light text-slate-400">v2.0</span></h1>
-            <div class="flex gap-4">
-                <button onclick="showSection('policies')" class="px-4 py-2 glass rounded-lg hover:bg-sky-600 transition"><i class="fas fa-user-shield"></i> Security Policies</button>
-                <button onclick="showSection('audit')" class="px-4 py-2 glass rounded-lg hover:bg-sky-600 transition"><i class="fas fa-history"></i> Audit History</button>
+    <div class="max-w-4xl mx-auto">
+        <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+            <h1 class="text-2xl font-bold text-sky-400 font-mono tracking-tighter">SHIELD-AI <span class="text-xs bg-sky-900/50 px-2 py-1 rounded text-sky-200">v2.1</span></h1>
+            <div class="flex gap-2">
+                <button onclick="openModal('policies')" class="text-[10px] bg-slate-800 px-3 py-2 rounded-lg border border-slate-700 hover:border-sky-500 transition"><i class="fas fa-user-shield text-sky-400"></i> Policies</button>
+                <button onclick="openModal('audit')" class="text-[10px] bg-slate-800 px-3 py-2 rounded-lg border border-slate-700 hover:border-sky-500 transition"><i class="fas fa-history text-sky-400"></i> Audit History</button>
             </div>
-        </header>
+        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="glass-card p-4 rounded-2xl text-center">
+                <span class="text-slate-500 text-xs block mb-1">Leaks Blocked</span>
+                <span id="blockedCount" class="text-3xl font-black text-red-500">0</span>
+            </div>
+            <div class="glass-card p-4 rounded-2xl text-center">
+                <span class="text-slate-500 text-xs block mb-1">Shield Status</span>
+                <span class="text-emerald-400 text-sm font-bold flex items-center justify-center gap-1"><i class="fas fa-circle text-[8px] animate-pulse"></i> ACTIVE</span>
+            </div>
+        </div>
+
+        <div class="glass-card rounded-3xl p-4 flex flex-col h-[60vh]">
+            <div id="chatBox" class="flex-1 overflow-y-auto space-y-4 mb-4 text-sm scrollbar-hide">
+                <div class="bg-blue-900/20 text-blue-200 p-3 rounded-2xl border border-blue-800/30 text-xs">
+                    Welcome Admin. System is active. PII masking enabled.
+                </div>
+            </div>
             
-            <div class="lg:col-span-1 space-y-6">
-                <div class="glass p-6 rounded-2xl">
-                    <h3 class="text-slate-400 mb-2">Leaks Blocked</h3>
-                    <p id="blockedCount" class="text-5xl font-bold text-red-500">0</p>
-                </div>
-                <div class="glass p-6 rounded-2xl">
-                    <h3 class="text-slate-400 mb-2">Security Status</h3>
-                    <p class="text-2xl font-bold text-emerald-400"><i class="fas fa-check-circle"></i> Active Shield</p>
-                </div>
-            </div>
-
-            <div id="main-section" class="lg:col-span-2 glass rounded-2xl p-6 h-[500px] flex flex-col">
-                <div id="chatBox" class="flex-1 overflow-y-auto mb-4 space-y-4 p-2 text-sm">
-                    <div class="bg-slate-800 p-3 rounded-lg border-r-4 border-sky-500">Welcome Admin. ShieldAI is monitoring all outgoing PII data.</div>
-                </div>
+            <div class="space-y-3">
+                <input id="license" type="password" placeholder="Enter License Key (admin123)" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl text-sm outline-none focus:border-sky-500 transition">
                 <div class="flex gap-2">
-                    <input id="license" type="password" placeholder="License Key" class="w-1/4 bg-slate-900 border border-slate-700 p-3 rounded-xl outline-none focus:border-sky-500">
-                    <input id="userInput" type="text" placeholder="Type sensitive prompt..." class="flex-1 bg-slate-900 border border-slate-700 p-3 rounded-xl outline-none focus:border-sky-500">
-                    <button onclick="sendMessage()" class="bg-sky-600 hover:bg-sky-500 px-6 py-3 rounded-xl transition font-bold">SEND</button>
+                    <input id="userInput" type="text" placeholder="Your message..." class="flex-1 bg-slate-900/50 border border-slate-700 p-3 rounded-xl text-sm outline-none focus:border-sky-500 transition">
+                    <button onclick="sendMessage()" class="bg-sky-600 hover:bg-sky-500 px-5 rounded-xl transition shadow-lg shadow-sky-900/20"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="modalOverlay" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-4">
-        <div class="glass max-w-2xl w-full p-8 rounded-3xl relative">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-2xl">&times;</button>
-            <div id="modalContent"></div>
+    <div id="modalOverlay" class="fixed inset-0 bg-black/90 hidden z-50 items-center justify-center p-6 backdrop-blur-sm">
+        <div class="glass-card w-full max-w-md p-6 rounded-3xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modalTitle" class="text-xl font-bold text-sky-400 font-mono"></h2>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div id="modalBody" class="text-sm space-y-3 max-h-[60vh] overflow-y-auto pr-2"></div>
         </div>
     </div>
 
     <script>
-        let history = JSON.parse(localStorage.getItem('shieldLogs') || '[]');
+        // نظام السجلات Audit History
+        let logs = JSON.parse(localStorage.getItem('shieldLogs') || '[]');
+        updateUI();
+
+        function updateUI() {
+            const count = logs.filter(l => l.status === 'REDACTED').length;
+            document.getElementById('blockedCount').innerText = count;
+        }
 
         async function sendMessage() {
             const prompt = document.getElementById('userInput').value;
             const key = document.getElementById('license').value;
-            if(!prompt || !key) return alert("Missing Input");
-
             const chatBox = document.getElementById('chatBox');
-            chatBox.innerHTML += `<div class="text-sky-300"><b>You:</b> ${prompt}</div>`;
+
+            if(!prompt || !key) {
+                alert("Please fill in both the message and the license key!");
+                return;
+            }
+
+            chatBox.innerHTML += `<div class="text-right ml-12"><span class="inline-block bg-sky-600/20 text-sky-100 p-3 rounded-2xl rounded-tr-none text-xs border border-sky-500/20">${prompt}</span></div>`;
 
             try {
                 const res = await fetch('/api/chat', {
@@ -75,57 +91,52 @@
                 });
                 const data = await res.json();
 
-                // تحديث العداد
-                if(data.security) {
-                    document.getElementById('blockedCount').innerText = data.security.blocked;
-                    if(data.shielded) {
-                        chatBox.innerHTML += `<div class="text-red-400 text-xs italic"><i class="fas fa-user-secret"></i> ShieldAI intercepted sensitive data!</div>`;
-                    }
+                if(data.reply) {
+                    chatBox.innerHTML += `<div class="mr-12"><span class="inline-block bg-slate-800 p-3 rounded-2xl rounded-tl-none text-xs border border-slate-700">${data.reply}</span></div>`;
+                    
+                    // تحديث الـ Audit History
+                    logs.unshift({ time: new Date().toLocaleTimeString(), status: data.shielded ? 'REDACTED' : 'CLEAN', text: prompt.substring(0, 20) + '...' });
+                    localStorage.setItem('shieldLogs', JSON.stringify(logs.slice(0, 20))); // حفظ آخر 20
+                    updateUI();
                 }
-
-                chatBox.innerHTML += `<div class="bg-slate-700 p-3 rounded-lg"><b>AI:</b> ${data.reply}</div>`;
                 
-                // حفظ في السجل (Audit History)
-                history.push({ date: new Date().toLocaleString(), prompt, status: data.shielded ? 'REDACTED' : 'CLEAN' });
-                localStorage.setItem('shieldLogs', JSON.stringify(history));
-
                 chatBox.scrollTop = chatBox.scrollHeight;
                 document.getElementById('userInput').value = "";
             } catch (e) {
-                alert("Connection Error");
+                alert("Gateway Error. Check Vercel Logs.");
             }
         }
 
-        function showSection(type) {
+        function openModal(type) {
             const overlay = document.getElementById('modalOverlay');
-            const content = document.getElementById('modalContent');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
             overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
 
             if(type === 'policies') {
-                content.innerHTML = `
-                    <h2 class="text-2xl font-bold mb-4 text-sky-400">📜 Security Policies</h2>
-                    <ul class="space-y-3">
-                        <li class="p-3 bg-slate-800 rounded-lg">✅ <b>PII Masking:</b> Automatic redaction of Emails, Phones, and Keys.</li>
-                        <li class="p-3 bg-slate-800 rounded-lg">✅ <b>Model Guard:</b> All requests routed via Groq secure tunnel.</li>
-                        <li class="p-3 bg-slate-800 rounded-lg">✅ <b>Zero-Logs:</b> Raw prompt data is never stored on disk.</li>
-                    </ul>
+                title.innerText = "Security Policies";
+                body.innerHTML = `
+                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>PII Masking:</b> Automatically redacts emails, phones, and API keys before AI processing.</div>
+                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>Groq Tunnel:</b> Uses ultra-fast 800 tokens/sec processing.</div>
+                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>Zero Retention:</b> Raw data is never saved on servers.</div>
                 `;
-            } else if(type === 'audit') {
-                let logHtml = history.map(h => `
-                    <div class="flex justify-between border-b border-slate-700 py-2 text-xs">
-                        <span>${h.date}</span>
-                        <span class="${h.status === 'REDACTED' ? 'text-red-400' : 'text-emerald-400'}">${h.status}</span>
+            } else {
+                title.innerText = "Audit History";
+                body.innerHTML = logs.map(l => `
+                    <div class="audit-log-item flex justify-between items-center">
+                        <span class="text-[10px] text-slate-500">${l.time}</span>
+                        <span class="text-[10px] flex-1 px-4 truncate">${l.text}</span>
+                        <span class="${l.status === 'REDACTED' ? 'text-red-400' : 'text-emerald-400'} text-[9px] font-bold">${l.status}</span>
                     </div>
-                `).join('') || "No history yet.";
-                content.innerHTML = `
-                    <h2 class="text-2xl font-bold mb-4 text-sky-400">📜 Audit History</h2>
-                    <div class="max-h-60 overflow-y-auto">${logHtml}</div>
-                `;
+                `).join('') || '<p class="text-center text-slate-500">No logs found.</p>';
             }
         }
 
         function closeModal() {
-            document.getElementById('modalOverlay').classList.add('hidden');
+            const overlay = document.getElementById('modalOverlay');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
         }
     </script>
 </body>

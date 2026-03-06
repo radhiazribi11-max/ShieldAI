@@ -1,27 +1,16 @@
-import { sanitizeInput } from "./privacy.js";
+export default async function handler(req, res) {
+    const { text } = req.body;
+    if (!text) return res.status(400).json({ error: "No text provided" });
 
-export default function handler(req, res) {
-    // هذا الملف مخصص ليكون API خارجي للشركات
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: "Method Not Allowed" });
-    }
+    // منطق مسح البيانات (Redaction Logic)
+    let cleanText = text
+        .replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '[REDACTED_EMAIL]')
+        .replace(/\+?\d{10,14}/g, '[REDACTED_PHONE]')
+        .replace(/sk-[a-zA-Z0-9]{32,}/g, '[REDACTED_API_KEY]');
 
-    const { text, apiKey } = req.body;
-
-    // هنا يمكنك مستقبلاً التحقق من اشتراك الشركة عبر الـ apiKey
-    if (!text) {
-        return res.status(400).json({ error: "No text provided" });
-    }
-
-    // تنظيف النص باستخدام المحرك الذي صنعناه
-    const cleanedText = sanitizeInput(text);
-
-    // إرسال النص النظيف للشركة
-    res.status(200).json({
+    res.status(200).json({ 
         original: text,
-        protected: cleanedText,
-        status: "Shielded by ShieldAI",
+        protected: cleanText,
         timestamp: new Date().toISOString()
     });
 }
-

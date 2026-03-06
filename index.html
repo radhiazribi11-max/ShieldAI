@@ -1,239 +1,102 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShieldAI | Enterprise Privacy Layer</title>
-    
+    <title>ShieldAI | Enterprise Privacy Layer for AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
-        body { background-color: #050a18; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(56, 189, 248, 0.1); }
-        .neon-text { text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
-        .gradient-border { border-bottom: 2px solid #38bdf8; box-shadow: 0 4px 20px -5px rgba(56, 189, 248, 0.3); }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { background-color: #050a18; color: #e2e8f0; font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .hero-gradient { background: radial-gradient(circle at center, #1e293b 0%, #050a18 100%); }
+        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(56, 189, 248, 0.1); }
+        .btn-primary { background: linear-gradient(90deg, #38bdf8 0%, #0ea5e9 100%); transition: all 0.3s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(56, 189, 248, 0.4); }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8">
+<body>
 
-    <div class="max-w-5xl mx-auto">
-        <header class="flex justify-between items-center mb-10 pb-4 gradient-border">
-            <div class="flex items-center gap-3">
-                <div class="bg-sky-500 p-2 rounded-lg shadow-lg shadow-sky-500/20">
-                    <i class="fas fa-shield-halved text-white text-xl"></i>
-                </div>
-                <h1 class="text-2xl font-black tracking-tighter text-white neon-text">SHIELD<span class="text-sky-400">AI</span></h1>
-            </div>
-            <div class="flex gap-3">
-                <button onclick="openModal('policies')" class="text-[10px] font-bold bg-slate-800/50 hover:bg-slate-700 px-4 py-2 rounded-full border border-slate-700 transition-all">
-                    <i class="fas fa-lock-open mr-1"></i> PRIVACY TRUST
-                </button>
-                <button onclick="openModal('audit')" class="text-[10px] font-bold bg-sky-600 hover:bg-sky-500 px-4 py-2 rounded-full transition-all shadow-lg shadow-sky-900/20">
-                    <i class="fas fa-file-contract mr-1"></i> SECURITY AUDIT
-                </button>
-            </div>
-        </header>
+    <nav class="flex justify-between items-center p-6 max-w-7xl mx-auto sticky top-0 z-50 glass mt-4 rounded-full px-8">
+        <div class="text-xl font-black tracking-tighter text-white uppercase italic">🛡️ Shield<span class="text-sky-400">AI</span></div>
+        <div class="hidden md:flex gap-8 text-[10px] font-bold uppercase tracking-[0.2em]">
+            <a href="#features" class="hover:text-sky-400 transition">Features</a>
+            <a href="privacy.html" class="hover:text-sky-400 transition">Security</a>
+            <a href="docs.html" class="hover:text-sky-400 transition">API Docs</a>
+        </div>
+        <a href="login.html" class="btn-primary px-8 py-2.5 rounded-full text-[10px] font-black text-white shadow-lg">CLIENT LOGIN</a>
+    </nav>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="glass-card p-5 rounded-3xl text-center">
-                <span class="text-slate-500 text-[9px] uppercase font-bold tracking-widest block mb-2">Leaks Intercepted</span>
-                <span id="blockedCount" class="text-3xl font-black text-red-500 italic">0</span>
+    <section class="hero-gradient min-h-[90vh] flex flex-col items-center justify-center text-center px-6">
+        <div class="inline-block px-4 py-1 rounded-full border border-sky-500/30 text-sky-400 text-[9px] font-black mb-8 uppercase tracking-[0.3em] animate-pulse">
+            Enterprise-Grade Privacy for LLMs
+        </div>
+        <h1 class="text-5xl md:text-8xl font-black mb-6 leading-[1.1] tracking-tighter text-white">
+            Stop Data Leaks. <br> <span class="text-sky-400 italic">Chat with Confidence.</span>
+        </h1>
+        <p class="text-slate-400 max-w-2xl mb-12 text-lg font-medium leading-relaxed">
+            ShieldAI acts as a secure firewall between your team and AI models. We redact PII, mask emails, and ensure your enterprise secrets never leave your control.
+        </p>
+        <div class="flex flex-col md:grow-0 md:flex-row gap-6">
+            <a href="login.html" class="btn-primary px-12 py-5 rounded-2xl font-black text-white shadow-2xl text-sm uppercase tracking-widest">
+                Start Protecting Free
+            </a>
+            <a href="https://Radhiayt.gumroad.com/l/ofuefu" target="_blank" class="glass px-12 py-5 rounded-2xl font-bold text-sm hover:bg-slate-800 transition uppercase tracking-widest">
+                Upgrade to Pro
+            </a>
+        </div>
+    </section>
+
+    <section id="features" class="py-32 px-6 max-w-7xl mx-auto border-t border-slate-900">
+        <h2 class="text-center text-3xl font-black mb-16 uppercase tracking-widest text-sky-400">Why Companies Trust ShieldAI</h2>
+        <div class="grid md:grid-cols-3 gap-10">
+            <div class="glass p-10 rounded-[40px] border-t-4 border-sky-500">
+                <i class="fas fa-user-shield text-sky-400 text-4xl mb-6"></i>
+                <h3 class="text-xl font-black mb-4 uppercase">PII Redaction</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">Automatically scrub emails, phone numbers, and credentials before they hit any AI server.</p>
             </div>
-            <div class="glass-card p-5 rounded-3xl text-center border-sky-500/10">
-                <span class="text-slate-500 text-[9px] uppercase font-bold tracking-widest block mb-2">Available Credits</span>
-                <span id="usageStatus" class="text-2xl font-black text-sky-400">---</span>
+            <div class="glass p-10 rounded-[40px] border-t-4 border-emerald-500">
+                <i class="fas fa-database text-emerald-400 text-4xl mb-6"></i>
+                <h3 class="text-xl font-black mb-4 uppercase">Zero Retention</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">We never store your raw prompts. Your data is processed in-flight and instantly discarded.</p>
             </div>
-            <div class="glass-card p-5 rounded-3xl text-center">
-                <span class="text-slate-500 text-[9px] uppercase font-bold tracking-widest block mb-2">Account Status</span>
-                <span id="planType" class="text-[10px] bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full font-bold">FREE TIER</span>
-            </div>
-            <div class="glass-card p-5 rounded-3xl text-center hidden md:block">
-                <span class="text-slate-500 text-[9px] uppercase font-bold tracking-widest block mb-2">Safety Score</span>
-                <span class="text-xl font-black text-white">99.9<span class="text-[10px] text-sky-400">%</span></span>
+            <div class="glass p-10 rounded-[40px] border-t-4 border-purple-500">
+                <i class="fas fa-file-invoice text-purple-400 text-4xl mb-6"></i>
+                <h3 class="text-xl font-black mb-4 uppercase">PDF Audit Logs</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">Generate official security reports of every interaction to prove compliance to stakeholders.</p>
             </div>
         </div>
+    </section>
 
-        <div class="glass-card rounded-[40px] p-6 flex flex-col h-[65vh] shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-sky-500/5 rounded-full blur-3xl -z-10"></div>
-            
-            <div id="chatBox" class="flex-1 overflow-y-auto space-y-6 mb-6 pr-4">
-                <div class="bg-sky-500/5 text-sky-300 p-4 rounded-2xl border border-sky-500/10 text-[11px] text-center leading-relaxed">
-                    <i class="fas fa-info-circle mr-2"></i> 
-                    Enterprise-grade PII Scrubbing Active. All sensitive data (Emails, Phones, API Keys) is redacted before AI processing.
+    <section id="pricing" class="py-32 bg-slate-900/20">
+        <div class="max-w-4xl mx-auto text-center px-6">
+            <h2 class="text-4xl font-black mb-8 uppercase tracking-tighter">Ready to Scale <span class="text-sky-400 italic">Safely?</span></h2>
+            <div class="glass p-12 rounded-[50px] border-sky-500/20 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 bg-sky-500 text-white text-[9px] font-black uppercase -rotate-45 translate-x-12 translate-y-4 w-48 text-center shadow-lg">
+                    Enterprise Choice
                 </div>
-            </div>
-            
-            <div class="space-y-4 pt-4 border-t border-slate-800">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-                    <div class="md:col-span-4 relative">
-                        <i class="fas fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                        <input id="license" type="password" placeholder="License Key (sk_...)" class="w-full bg-slate-900/80 border border-slate-700 pl-10 pr-4 py-3 rounded-2xl text-xs outline-none focus:border-sky-500 transition-all">
-                    </div>
-                    <div class="md:col-span-8 flex gap-2">
-                        <input id="userInput" type="text" placeholder="Type your secure prompt here..." class="flex-1 bg-slate-900/80 border border-slate-700 px-5 py-3 rounded-2xl text-xs outline-none focus:border-sky-500 transition-all">
-                        <button onclick="sendMessage()" class="bg-sky-600 hover:bg-sky-500 px-8 rounded-2xl transition-all shadow-lg shadow-sky-900/40 group">
-                            <i class="fas fa-paper-plane group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-center px-2">
-                    <p class="text-[9px] text-slate-500 uppercase tracking-widest italic">Encrypted Tunnel: GROQ-LPU-V1</p>
-                    <a href="https://Radhiayt.gumroad.com/l/ofuefu" target="_blank" class="text-[10px] text-sky-400 font-bold hover:text-white transition-colors underline decoration-sky-500/30 underline-offset-4">
-                        <i class="fas fa-crown mr-1"></i> UPGRADE TO UNLIMITED PRO
-                    </a>
-                </div>
+                <h3 class="text-5xl font-black mb-4">$29<span class="text-sm font-normal text-slate-500">/monthly</span></h3>
+                <p class="text-slate-400 mb-8 max-w-md mx-auto">Get unlimited redaction, professional security models, and enterprise API access for your entire team.</p>
+                <a href="https://Radhiayt.gumroad.com/l/ofuefu" class="btn-primary px-16 py-5 rounded-2xl font-black inline-block text-white shadow-xl hover:scale-105 transition">UPGRADE NOW</a>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div id="modalOverlay" class="fixed inset-0 bg-black/95 hidden z-[100] items-center justify-center p-6 backdrop-blur-md">
-        <div class="glass-card w-full max-w-lg p-8 rounded-[35px] relative border-sky-500/20 shadow-2xl">
-            <button onclick="closeModal()" class="absolute top-6 right-6 text-slate-500 hover:text-white text-3xl transition-colors">&times;</button>
-            <h2 id="modalTitle" class="text-2xl font-black text-sky-400 mb-6 font-mono tracking-tight uppercase"></h2>
-            <div id="modalBody" class="text-sm space-y-4 max-h-[50vh] overflow-y-auto pr-4 custom-scroll"></div>
-            <div id="modalFooter" class="mt-8"></div>
+    <footer class="p-20 text-center border-t border-slate-900 bg-black/40">
+        <div class="text-xl font-black text-white italic mb-4">🛡️ SHIELD<span class="text-sky-400">AI</span></div>
+        <div class="flex justify-center gap-6 text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-10">
+            <a href="privacy.html" class="hover:text-white">Privacy Policy</a>
+            <a href="terms.html" class="hover:text-white">Terms of Service</a>
+            <a href="docs.html" class="hover:text-white">API Documentation</a>
         </div>
-    </div>
-
-    <script>
-        let localAudit = JSON.parse(localStorage.getItem('shieldLogs') || '[]');
-
-        async function sendMessage() {
-            const prompt = document.getElementById('userInput').value;
-            const key = document.getElementById('license').value;
-            const chatBox = document.getElementById('chatBox');
-
-            if(!prompt || !key) return alert("Security Alert: Please enter both prompt and license key.");
-
-            // Add User Bubble
-            chatBox.innerHTML += `
-                <div class="flex justify-end">
-                    <div class="max-w-[80%] bg-slate-800/50 p-4 rounded-3xl rounded-tr-none border border-slate-700 text-xs">
-                        <span class="text-sky-400 font-bold block mb-1 uppercase text-[8px]">User Input</span>
-                        ${prompt}
-                    </div>
-                </div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            try {
-                const res = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ prompt, licenseKey: key })
-                });
-                const data = await res.json();
-
-                if(data.error) {
-                    alert("Access Denied: " + data.error);
-                } else {
-                    // Update Stats Dashboard
-                    document.getElementById('usageStatus').innerText = data.usage.max - data.usage.current;
-                    document.getElementById('planType').innerText = (data.usage.max > 500) ? 'PRO ACCOUNT' : 'FREE TIER';
-                    
-                    // Add AI Response Bubble
-                    chatBox.innerHTML += `
-                        <div class="flex justify-start animate-in fade-in duration-500">
-                            <div class="max-w-[80%] bg-sky-600/10 p-4 rounded-3xl rounded-tl-none border border-sky-500/20 text-xs text-sky-50">
-                                <span class="text-sky-400 font-bold block mb-1 uppercase text-[8px]">Shielded AI Response</span>
-                                ${data.reply}
-                            </div>
-                        </div>`;
-                    
-                    if(data.shielded) {
-                        document.getElementById('blockedCount').innerText = parseInt(document.getElementById('blockedCount').innerText) + 1;
-                        chatBox.innerHTML += `<div class="text-red-400 text-[9px] font-bold text-center tracking-widest uppercase animate-pulse"><i class="fas fa-user-secret mr-1"></i> Data Leak Prevented</div>`;
-                    }
-
-                    // Log Audit
-                    localAudit.unshift({ 
-                        time: new Date().toLocaleString(), 
-                        status: data.shielded ? 'REDACTED' : 'CLEAN', 
-                        text: prompt.substring(0, 50) + '...' 
-                    });
-                    localStorage.setItem('shieldLogs', JSON.stringify(localAudit.slice(0, 20)));
-                }
-                chatBox.scrollTop = chatBox.scrollHeight;
-                document.getElementById('userInput').value = "";
-            } catch (e) {
-                alert("Connection Error: Please ensure Supabase SQL is executed.");
-            }
-        }
-
-        function openModal(type) {
-            document.getElementById('modalOverlay').classList.replace('hidden', 'flex');
-            const title = document.getElementById('modalTitle');
-            const body = document.getElementById('modalBody');
-            const footer = document.getElementById('modalFooter');
-
-            if(type === 'policies') {
-                title.innerText = "Security Architecture";
-                body.innerHTML = `
-                    <div class="space-y-4">
-                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800">
-                            <h4 class="text-sky-400 font-bold mb-1 text-xs uppercase">1. PII Redaction</h4>
-                            <p class="text-[11px] text-slate-400">Emails, Phone numbers, and Social Security numbers are automatically scrubbed locally.</p>
-                        </div>
-                        <div class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800">
-                            <h4 class="text-sky-400 font-bold mb-1 text-xs uppercase">2. Zero Storage</h4>
-                            <p class="text-[11px] text-slate-400">We do not store prompts or AI replies on our servers. Your data stays yours.</p>
-                        </div>
-                    </div>`;
-                footer.innerHTML = "";
-            } else {
-                title.innerText = "System Audit Logs";
-                body.innerHTML = localAudit.map(l => `
-                    <div class="flex justify-between items-center p-3 bg-slate-900/30 rounded-xl border-b border-slate-800/50">
-                        <div class="flex flex-col">
-                            <span class="text-[9px] text-slate-500">${l.time}</span>
-                            <span class="text-xs truncate max-w-[200px]">${l.text}</span>
-                        </div>
-                        <span class="px-2 py-1 rounded text-[9px] font-bold ${l.status==='CLEAN'?'bg-emerald-500/10 text-emerald-400':'bg-red-500/10 text-red-400'}">${l.status}</span>
-                    </div>
-                `).join('') || '<p class="text-center text-slate-500 text-xs">No activity recorded yet.</p>';
-                
-                footer.innerHTML = `
-                    <button onclick="downloadPDF()" class="w-full bg-emerald-600 hover:bg-emerald-500 p-4 rounded-2xl font-bold text-xs transition-all shadow-lg shadow-emerald-900/20 uppercase tracking-widest">
-                        <i class="fas fa-download mr-2"></i> Export Official Security Report (PDF)
-                    </button>`;
-            }
-        }
-
-        function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFontSize(22); doc.setTextColor(0, 150, 255); doc.text("ShieldAI Security Report", 20, 25);
-            doc.setFontSize(10); doc.setTextColor(100); doc.text(`Generated: ${new Date().toLocaleString()}`, 20, 35);
-            doc.setDrawColor(200); doc.line(20, 40, 190, 40);
-            
-            let y = 50;
-            localAudit.forEach(log => {
-                if(y > 270) { doc.addPage(); y = 20; }
-                doc.setFontSize(9); doc.setTextColor(50);
-                doc.text(`${log.time} | [${log.status}] | Prompt Fragment: ${log.text}`, 20, y);
-                y += 10;
-            });
-            doc.save("ShieldAI-Audit-Report.pdf");
-        }
-
-        function closeModal() { document.getElementById('modalOverlay').classList.replace('flex', 'hidden'); }
-    </script>
+        <div class="text-slate-700 text-[8px] uppercase tracking-[0.5em]">&copy; 2026 ShieldAI Security Gateway. Built for Secure Intelligence.</div>
+    </footer>
 
     <script type="text/javascript">
-      window.$crisp=[];
-      window.CRISP_WEBSITE_ID="525c7845-cadb-44e2-96b3-ae84e645661b";
-      (function(){
-        d=document;
-        s=d.createElement("script");
-        s.src="https://client.crisp.chat/l.js";
-        s.async=1;
-        d.getElementsByTagName("head")[0].appendChild(s);
-      })();
+      window.$crisp=[]; window.CRISP_WEBSITE_ID="525c7845-cadb-44e2-96b3-ae84e645661b";
+      (function(){ d=document; s=d.createElement("script"); s.src="https://client.crisp.chat/l.js"; s.async=1; d.getElementsByTagName("head")[0].appendChild(s); })();
     </script>
+
 </body>
-</html>
+    </html>
+                    

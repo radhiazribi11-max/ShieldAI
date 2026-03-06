@@ -11,37 +11,50 @@ export default async function handler(req, res) {
     const scan = scanPrompt(prompt);
     const API_KEY = process.env.GEMINI_KEY;
 
-    try {
-        // التغيير هنا: v1 بدلاً من v1beta و حذف -latest
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: scan.clean }] }]
-            })
-        });
+    // قائمة الاحتمالات لعام 2026 حسب تحديثات جوجل
+    const potentialModels = [
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-pro",
+        "gemini-1.0-pro"
+    ];
 
-        const data = await response.json();
+    // محاولة الاتصال بالنسخ v1 و v1beta لضمان النجاح
+    const apiVersions = ["v1", "v1beta"];
 
-        if (data.error) {
-            // إذا فشل هذا أيضاً، سنقوم بتبديل الموديل برمجياً في المحاولة القادمة
-            return res.status(500).json({ 
-                error: `Google API Error: ${data.error.message}`,
-                suggestion: "Try changing model name in the code to 'gemini-pro' if this persists."
-            });
-        }
+    for (let version of apiVersions) {
+        for (let modelName of potentialModels) {
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/${version}/models/${modelName}:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: scan.clean }] }]
+                    })
+                });
 
-        let aiReply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "AI returned empty response";
+                const data = await response.json();
 
-        return res.status(200).json({
-            reply: aiReply,
-            securityReport: {
-                isSafe: !scan.blocked,
-                blockedCount: scan.piiCount,
-                status: scan.blocked ? "🛡️ Shielded" : "✅ Clean"
+                if (data.candidates && data.candidates[0].content) {
+                    const reply = data.candidates[0].content.parts[0].text;
+                    // نجاح! نعيد النتيجة مع اسم الموديل الذي نجح
+                    return res.status(200).json({
+                        reply: reply,
+                        engine: `${modelName} (${version})`,
+                        securityReport: {
+                            isSafe: !scan.blocked,
+                            status: scan.blocked ? "🛡️ Shielded" : "✅ Clean"
+                        }
+                    });
+                }
+            } catch (e) {
+                continue; // جرب الاحتمال التالي
             }
-        });
-    } catch (err) {
-        res.status(500).json({ error: "Gateway Error", details: err.message });
+        }
     }
+
+    return res.status(500).json({ 
+        error: "All Google Models Failed", 
+        detail: "Please ensure your API Key is active in Google AI Studio and has no billing issues." 
+    });
 }

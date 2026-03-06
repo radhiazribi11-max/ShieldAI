@@ -1,37 +1,60 @@
-const { createClient } = require("@supabase/supabase-js");
+const { createClient } = require('@supabase/supabase-js');
 
 module.exports = async (req, res) => {
+
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") return res.status(200).end();
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
   try {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-    const { licenseKey, prompt } = req.body;
 
-    if (!licenseKey) return res.status(400).json({ error: "License key missing" });
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_KEY
+    );
 
-    const { data, error } = await supabase
+    const { prompt, licenseKey } = req.body;
+
+    if (!licenseKey) {
+      return res.status(401).json({ error: "License missing" });
+    }
+
+    const { data: user, error } = await supabase
       .from("usage_tracking")
       .select("*")
       .eq("license_key", licenseKey)
       .single();
 
-    if (error || !data) return res.status(401).json({ error: "Invalid license" });
+    if (error || !user) {
+      return res.status(401).json({ error: "Invalid license" });
+    }
 
-    // تحديث العداد
+    if (user.usage_count >= user.max_limit) {
+      return res.status(403).json({ error: "Usage limit reached" });
+    }
+
     await supabase
       .from("usage_tracking")
-      .update({ usage_count: (data.usage_count || 0) + 1 })
+      .update({ usage_count: user.usage_count + 1 })
       .eq("license_key", licenseKey);
 
-    return res.status(200).json({ reply: "ShieldAI: OK" });
+    return res.status(200).json({
+      reply: "ShieldAI Secure Response: Request processed successfully"
+    });
 
-  } catch (e) {
-    return res.status(500).json({ error: e.message });
+  } catch (err) {
+
+    return res.status(500).json({
+      error: err.message
+    });
+
   }
 };
-      

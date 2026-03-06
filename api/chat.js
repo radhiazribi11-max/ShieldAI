@@ -8,7 +8,6 @@ export default async function handler(req, res) {
   try {
     const { prompt, licenseKey } = req.body;
 
-    // 1. التحقق من الرخصة والرصيد
     const { data: user, error: fetchError } = await supabase
       .from('usage_tracking')
       .select('*')
@@ -18,10 +17,8 @@ export default async function handler(req, res) {
     if (fetchError || !user) return res.status(401).json({ error: 'Invalid License' });
     if (user.usage_count >= user.max_limit) return res.status(403).json({ error: 'Limit reached' });
 
-    // 2. معالجة النص (محاكاة الحماية)
-    const secureReply = `ShieldAI verified: Your message "${prompt}" was processed securely with PII protection.`;
+    const secureReply = `ShieldAI verified: Your message was processed securely.`;
 
-    // 3. تحديث الاستهلاك في Supabase
     await supabase
       .from('usage_tracking')
       .update({ usage_count: user.usage_count + 1 })

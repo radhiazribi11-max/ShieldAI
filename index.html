@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShieldAI | Dashboard</title>
+    <title>ShieldAI | Enterprise Privacy Dashboard</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #050a18; color: #e2e8f0; font-family: sans-serif; }
+        body { background-color: #050a18; color: #e2e8f0; font-family: 'Inter', sans-serif; }
         .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(56, 189, 248, 0.1); }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
         .neon-border { border-bottom: 2px solid #38bdf8; box-shadow: 0 4px 15px -5px #38bdf8; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8">
@@ -33,36 +33,38 @@
 
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
             <div class="glass-card p-4 rounded-2xl text-center">
-                <span class="text-slate-500 text-xs block mb-1">Leaks Blocked</span>
+                <span class="text-slate-500 text-[10px] uppercase block mb-1">Leaks Blocked</span>
                 <span id="blockedCount" class="text-3xl font-black text-red-500">0</span>
             </div>
             <div class="glass-card p-4 rounded-2xl text-center">
-                <span class="text-slate-500 text-xs block mb-1">الرصيد المتبقي</span>
-                <span id="usageStatus" class="text-xl font-bold text-sky-400">تحميل...</span>
+                <span class="text-slate-500 text-[10px] uppercase block mb-1">Remaining Credits</span>
+                <span id="usageStatus" class="text-xl font-bold text-sky-400">Loading...</span>
             </div>
             <div class="glass-card p-4 rounded-2xl text-center hidden md:block">
-                <span class="text-slate-500 text-xs block mb-1">Security Status</span>
-                <span class="text-emerald-400 text-sm font-bold"><i class="fas fa-check-circle"></i> ACTIVE</span>
+                <span class="text-slate-500 text-[10px] uppercase block mb-1">Shield Status</span>
+                <span class="text-emerald-400 text-sm font-bold flex items-center justify-center gap-1">
+                    <i class="fas fa-circle text-[8px] animate-pulse"></i> ACTIVE
+                </span>
             </div>
         </div>
 
         <div class="glass-card rounded-3xl p-4 flex flex-col h-[60vh] md:h-[500px]">
             <div id="chatBox" class="flex-1 overflow-y-auto space-y-4 mb-4 text-sm scrollbar-hide">
-                <div class="bg-blue-900/20 text-blue-200 p-3 rounded-2xl border border-blue-800/30 text-xs text-center">
-                    Welcome Admin. ShieldAI is active and monitoring PII data.
+                <div class="bg-blue-900/20 text-blue-200 p-3 rounded-2xl border border-blue-800/30 text-[10px] text-center italic">
+                    Encryption Active. All PII data is being redacted in real-time.
                 </div>
             </div>
             
             <div class="space-y-3">
-                <input id="license" type="password" placeholder="License Key (e.g. admin123)" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl text-sm outline-none focus:border-sky-500 transition">
+                <input id="license" type="password" placeholder="Enter License Key (e.g. admin123)" class="w-full bg-slate-900/50 border border-slate-700 p-3 rounded-xl text-sm outline-none focus:border-sky-500 transition">
                 <div class="flex gap-2">
-                    <input id="userInput" type="text" placeholder="Type your message..." class="flex-1 bg-slate-900/50 border border-slate-700 p-3 rounded-xl text-sm outline-none focus:border-sky-500 transition">
+                    <input id="userInput" type="text" placeholder="Type your secure prompt..." class="flex-1 bg-slate-900/50 border border-slate-700 p-3 rounded-xl text-sm outline-none focus:border-sky-500 transition">
                     <button onclick="sendMessage()" class="bg-sky-600 hover:bg-sky-500 px-6 rounded-xl transition shadow-lg shadow-sky-900/20">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
                 <div class="text-center">
-                    <a href="pricing.html" class="text-[10px] text-slate-500 hover:text-sky-400 underline transition">Upgrade to PRO for more limits</a>
+                    <a href="pricing.html" class="text-[10px] text-slate-500 hover:text-sky-400 underline transition tracking-widest uppercase">Upgrade to PRO Plan</a>
                 </div>
             </div>
         </div>
@@ -70,14 +72,13 @@
 
     <div id="modalOverlay" class="fixed inset-0 bg-black/90 hidden z-50 items-center justify-center p-6 backdrop-blur-sm">
         <div class="glass-card w-full max-w-md p-6 rounded-3xl relative">
-            <button onclick="closeModal()" class="absolute top-4 left-4 text-slate-400 hover:text-white text-2xl">&times;</button>
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl">&times;</button>
             <h2 id="modalTitle" class="text-xl font-bold text-sky-400 mb-6 font-mono"></h2>
             <div id="modalBody" class="text-sm space-y-3 max-h-[60vh] overflow-y-auto pr-2 scrollbar-hide"></div>
         </div>
     </div>
 
     <script>
-        // نظام السجلات المحلي للتذكير فقط (الأساس يأتي من Supabase)
         let localAudit = JSON.parse(localStorage.getItem('shieldLogs') || '[]');
 
         async function sendMessage() {
@@ -85,10 +86,9 @@
             const key = document.getElementById('license').value;
             const chatBox = document.getElementById('chatBox');
 
-            if(!prompt || !key) return alert("الرجاء إدخال الرسالة ومفتاح الترخيص!");
+            if(!prompt || !key) return alert("Please provide both message and License Key!");
 
-            // إضافة رسالة المستخدم للواجهة
-            chatBox.innerHTML += `<div class="text-right ml-12"><span class="inline-block bg-sky-600/20 text-sky-100 p-3 rounded-2xl rounded-tr-none text-xs border border-sky-500/20">${prompt}</span></div>`;
+            chatBox.innerHTML += `<div class="text-left mr-12"><span class="inline-block bg-slate-700/50 p-3 rounded-2xl rounded-tl-none text-xs border border-slate-600/30">You: ${prompt}</span></div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
@@ -100,45 +100,40 @@
                 const data = await res.json();
 
                 if(data.error) {
-                    chatBox.innerHTML += `<div class="text-center text-red-400 text-[10px] my-2">${data.error}</div>`;
+                    alert(data.error);
                 } else {
-                    // تحديث الرد من AI
-                    chatBox.innerHTML += `<div class="mr-12"><span class="inline-block bg-slate-800 p-3 rounded-2xl rounded-tl-none text-xs border border-slate-700">${data.reply}</span></div>`;
+                    document.getElementById('usageStatus').innerText = `${data.usage.max - data.usage.current} Requests Left`;
+                    chatBox.innerHTML += `<div class="text-right ml-12 mt-2"><span class="inline-block bg-sky-600/20 text-sky-100 p-3 rounded-2xl rounded-tr-none text-xs border border-sky-500/20">AI: ${data.reply}</span></div>`;
                     
-                    // تحديث عداد الاستهلاك من Supabase
-                    document.getElementById('usageStatus').innerText = `${data.usage.max - data.usage.current} طلب متبقي`;
-                    
-                    // تحديث سجل الأمان المحلي
                     if(data.shielded) {
                         document.getElementById('blockedCount').innerText = parseInt(document.getElementById('blockedCount').innerText) + 1;
-                        chatBox.innerHTML += `<div class="text-red-400 text-[10px] italic text-center animate-pulse"><i class="fas fa-user-secret"></i> PII Data Redacted by ShieldAI</div>`;
+                        chatBox.innerHTML += `<div class="text-red-400 text-[9px] italic text-center animate-pulse"><i class="fas fa-user-secret"></i> ShieldAI intercepted sensitive data!</div>`;
                     }
 
-                    // حفظ في الـ Audit History المحلي
                     localAudit.unshift({ time: new Date().toLocaleTimeString(), status: data.shielded ? 'REDACTED' : 'CLEAN', text: prompt.substring(0, 30) + '...' });
-                    localStorage.setItem('shieldLogs', JSON.stringify(localAudit.slice(0, 50)));
+                    localStorage.setItem('shieldLogs', JSON.stringify(localAudit.slice(0, 20)));
                 }
                 
                 chatBox.scrollTop = chatBox.scrollHeight;
                 document.getElementById('userInput').value = "";
             } catch (e) {
-                alert("خطأ في الاتصال بالسيرفر. تأكد من إعدادات Vercel.");
+                alert("Connection Error. Ensure Supabase Query is executed.");
             }
         }
 
         function openModal(type) {
             const overlay = document.getElementById('modalOverlay');
-            const title = document.getElementById('modalTitle');
-            const body = document.getElementById('modalBody');
             overlay.classList.remove('hidden');
             overlay.classList.add('flex');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
 
             if(type === 'policies') {
                 title.innerText = "Security Policies";
                 body.innerHTML = `
-                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>PII Masking:</b> يتم مسح الإيميلات والهواتف والمفاتيح قبل الإرسال.</div>
-                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>Engine:</b> معالجة فائقة السرعة عبر Groq LPU.</div>
-                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>Zero Storage:</b> لا يتم تخزين نصوص المحادثات في أي قاعدة بيانات.</div>
+                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>PII Masking:</b> Real-time removal of emails, phones, and private keys.</div>
+                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>Engine:</b> Secured via Groq LPU High-Speed Tunnel.</div>
+                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>Zero Storage:</b> We never store your raw prompts or AI replies.</div>
                 `;
             } else {
                 title.innerText = "Audit History";
@@ -148,41 +143,7 @@
                         <span class="text-[10px] flex-1 px-4 truncate">${l.text}</span>
                         <span class="${l.status === 'REDACTED' ? 'text-red-400' : 'text-emerald-400'} text-[9px] font-bold">${l.status}</span>
                     </div>
-                `).join('') || '<p class="text-center text-slate-500">لا توجد سجلات بعد.</p>';
-            }
-        }
-
-        function closeModal() {
-            const overlay = document.getElementById('modalOverlay');
-            overlay.classList.add('hidden');
-            overlay.classList.remove('flex');
-        }
-    </script>
-</body>
-</html>
-        function openModal(type) {
-            const overlay = document.getElementById('modalOverlay');
-            const title = document.getElementById('modalTitle');
-            const body = document.getElementById('modalBody');
-            overlay.classList.remove('hidden');
-            overlay.classList.add('flex');
-
-            if(type === 'policies') {
-                title.innerText = "Security Policies";
-                body.innerHTML = `
-                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>PII Masking:</b> Automatically redacts emails, phones, and API keys before AI processing.</div>
-                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>Groq Tunnel:</b> Uses ultra-fast 800 tokens/sec processing.</div>
-                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700"><b>Zero Retention:</b> Raw data is never saved on servers.</div>
-                `;
-            } else {
-                title.innerText = "Audit History";
-                body.innerHTML = logs.map(l => `
-                    <div class="audit-log-item flex justify-between items-center">
-                        <span class="text-[10px] text-slate-500">${l.time}</span>
-                        <span class="text-[10px] flex-1 px-4 truncate">${l.text}</span>
-                        <span class="${l.status === 'REDACTED' ? 'text-red-400' : 'text-emerald-400'} text-[9px] font-bold">${l.status}</span>
-                    </div>
-                `).join('') || '<p class="text-center text-slate-500">No logs found.</p>';
+                `).join('') || '<p class="text-center text-slate-500">No logs found yet.</p>';
             }
         }
 

@@ -1,45 +1,101 @@
 const { createClient } = require('@supabase/supabase-js');
-
-// تعريف واحد فقط للعميل خارج الدالة لضمان السرعة
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
-  // إعدادات CORS الموحدة
+
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // معالجة طلب الـ Preflight
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  
-  // قبول طلبات POST فقط
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
-  const { prompt, licenseKey } = req.body;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
   try {
-    // 1. جلب بيانات الرخصة
-    const { data: user, error: fetchError } = await supabase
+
+    const { prompt, licenseKey } = req.body;
+
+    if (!prompt || !licenseKey) {
+      return res.status(400).json({ error: "Missing prompt or license key" });
+    }
+
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_KEY
+    );
+
+    // جلب بيانات الرخصة
+    const { data: user, error } = await supabase
       .from('usage_tracking')
       .select('*')
       .eq('license_key', licenseKey)
       .single();
 
-    if (fetchError || !user) return res.status(401).json({ error: 'Invalid License' });
-    if (user.usage_count >= user.max_limit) return res.status(403).json({ error: 'Limit reached' });
+    if (error || !user) {
+      return res.status(403).json({ error: "Invalid license key" });
+    }
 
-    // 2. تحديث العداد (زيادة الاستهلاك بـ 1)
+    if (user.usage_count >= user.max_limit) {
+      return res.status(403).json({ error: "Limit reached" });
+    }
+
+    // طلب Groq
+    const ai = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "llama3-8b-8192",
+          messages: [
+            {
+              role: "system",
+              content: "You are ShieldAI enterprise AI security assistant."
+            },
+            {
+              role: "user",
+              content: prompt
+            }
+          ]
+        })
+      }
+    );
+
+    const aiData = await ai.json();
+
+    const reply = aiData.choices[0].message.content;
+
+    const newUsage = user.usage_count + 1;
+
+    // تحديث العداد
     await supabase
       .from('usage_tracking')
-      .update({ usage_count: (user.usage_count || 0) + 1 })
+      .update({ usage_count: newUsage })
       .eq('license_key', licenseKey);
 
-    // 3. الرد النهائي (الذي كان يظهر في صورتك الناجحة)
-    return res.status(200).json({ 
-      reply: `ShieldAI Secure Response: Processed your request successfully.` 
+    return res.status(200).json({
+      reply: reply,
+      usage: {
+        current: newUsage,
+        max: user.max_limit
+      }
     });
 
   } catch (err) {
-    return res.status(500).json({ error: err.message });
+
+    console.error(err);
+
+    return res.status(500).json({
+      error: "Server error"
+    });
+
   }
+
 };

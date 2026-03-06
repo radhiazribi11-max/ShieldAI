@@ -7,56 +7,74 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #0f172a; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
 </head>
-<body class="bg-gray-900 text-white font-sans">
+<body class="text-slate-200 font-sans antialiased">
 
-    <nav class="border-b border-gray-800 p-4 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
+    <nav class="border-b border-slate-800 p-4 bg-slate-900/80 sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">ShieldAI</h1>
-            <div id="user-info" class="text-sm text-gray-400">Loading account data...</div>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-shield-alt text-white"></i>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight">Shield<span class="text-blue-500">AI</span></h1>
+            </div>
+            <div id="user-info" class="text-[11px] font-mono text-slate-400 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 uppercase tracking-tighter">
+                <i class="fas fa-sync fa-spin mr-2"></i>Connecting...
+            </div>
         </div>
     </nav>
 
-    <main class="container mx-auto p-6 space-y-8">
+    <main class="container mx-auto p-4 md:p-8 max-w-6xl">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
-                <p class="text-gray-400 text-sm">Total Request Limit</p>
-                <h3 id="max-limit" class="text-3xl font-bold mt-2 text-white">5,000</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="glass-panel p-6 rounded-2xl">
+                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Plan Limit</p>
+                <h3 id="max-limit" class="text-2xl font-semibold">5,000</h3>
             </div>
-            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl border-l-4 border-l-blue-500">
-                <p class="text-gray-400 text-sm">Used Requests</p>
-                <h3 id="usage-count" class="text-3xl font-bold mt-2 text-blue-400">0</h3>
+            <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-blue-600">
+                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Requests Used</p>
+                <h3 id="usage-count" class="text-2xl font-semibold text-blue-400">0</h3>
             </div>
-            <div class="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl border-l-4 border-l-emerald-500">
-                <p class="text-gray-400 text-sm">Remaining Credits</p>
-                <h3 id="remaining" class="text-3xl font-bold mt-2 text-emerald-400">---</h3>
+            <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-emerald-500">
+                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Remaining</p>
+                <h3 id="remaining" class="text-2xl font-semibold text-emerald-400">---</h3>
             </div>
         </div>
 
-        <div class="bg-gray-800 rounded-3xl border border-gray-700 overflow-hidden flex flex-col h-[550px] shadow-2xl">
-            <div class="bg-gray-700/30 p-4 border-b border-gray-700 flex justify-between items-center">
-                <span class="flex items-center gap-2 text-sm font-medium">
-                    <i class="fas fa-user-shield text-emerald-400"></i> Privacy Shield Active
-                </span>
-                <span class="text-[10px] uppercase tracking-widest bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20 font-bold">
-                    Zero Storage Policy
-                </span>
+        <div class="glass-panel rounded-3xl overflow-hidden flex flex-col h-[600px] shadow-2xl">
+            
+            <div class="p-4 bg-slate-800/50 border-b border-slate-700 flex justify-between items-center">
+                <div class="flex items-center gap-2 text-xs font-medium text-emerald-400">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    Privacy Shield Active
+                </div>
+                <div class="text-[10px] text-slate-500 font-bold tracking-widest">v2.1.0-SECURE</div>
             </div>
             
-            <div id="chat-box" class="flex-1 p-6 overflow-y-auto space-y-4 text-sm scrollbar-thin scrollbar-thumb-gray-600">
-                <div class="bg-blue-500/10 border border-blue-500/20 p-4 rounded-2xl text-blue-200">
-                    <i class="fas fa-info-circle mr-2"></i> Welcome! Enter any text below. <strong>ShieldAI</strong> will automatically redact PII (Emails, Phones) before processing your request.
+            <div id="chat-box" class="flex-1 p-6 overflow-y-auto space-y-4 custom-scrollbar">
+                <div class="bg-blue-600/10 border border-blue-500/20 p-4 rounded-2xl text-blue-200 text-sm max-w-[85%]">
+                    <i class="fas fa-info-circle mr-2"></i> Welcome to the Secure Gateway. All Personal Identifiable Information (PII) is automatically scrubbed before reaching the AI models.
                 </div>
             </div>
 
-            <div class="p-4 bg-gray-900/40 border-t border-gray-700">
-                <div class="flex gap-4">
-                    <input id="user-input" type="text" placeholder="Type your message (e.g., Send email to john@example.com)..." 
-                        class="flex-1 bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-all text-sm">
-                    <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 flex items-center gap-2">
-                        <span>Send</span>
-                        <i class="fas fa-paper-plane"></i>
+            <div class="p-4 bg-slate-900/60 border-t border-slate-700">
+                <div class="flex gap-3">
+                    <input id="user-input" type="text" 
+                        onkeypress="if(event.key === 'Enter') sendMessage()"
+                        placeholder="Ask anything securely..." 
+                        class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm">
+                    <button id="send-btn" onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold transition-all flex items-center gap-2 active:scale-95 shadow-lg shadow-blue-600/30">
+                        <span>SEND</span>
+                        <i class="fas fa-paper-plane text-xs"></i>
                     </button>
                 </div>
             </div>
@@ -64,73 +82,93 @@
     </main>
 
     <script>
-        // Use the License Key from Login or fallback to Admin for testing
-        const licenseKey = localStorage.getItem('shield_key') || 'admin123';
-        
-        // Supabase Configuration
+        // Configuration
         const supabaseUrl = 'https://xjjuvagvfaocvszztkgh.supabase.co';
-        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; // REPLACE WITH YOUR ACTUAL ANON KEY
-        const supabase = supabasejs.createClient(supabaseUrl, supabaseKey);
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Ensure your Anon Key is correct here
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
+        // Session
+        let licenseKey = localStorage.getItem('shield_key') || 'admin123';
+
+        // Load stats from database
         async function loadUserData() {
-            const { data, error } = await supabase
-                .from('usage_tracking')
-                .select('*')
-                .eq('license_key', licenseKey)
-                .single();
+            try {
+                const { data, error } = await supabaseClient
+                    .from('usage_tracking')
+                    .select('*')
+                    .eq('license_key', licenseKey)
+                    .single();
 
-            if (data) {
-                document.getElementById('usage-count').innerText = data.usage_count.toLocaleString();
-                document.getElementById('max-limit').innerText = data.max_limit.toLocaleString();
-                document.getElementById('remaining').innerText = (data.max_limit - data.usage_count).toLocaleString();
-                document.getElementById('user-info').innerText = `Active Session: ${data.email || 'Admin User'}`;
-            } else {
-                document.getElementById('user-info').innerText = "Trial Mode (No active license found)";
+                if (data) {
+                    document.getElementById('usage-count').innerText = data.usage_count.toLocaleString();
+                    document.getElementById('max-limit').innerText = data.max_limit.toLocaleString();
+                    document.getElementById('remaining').innerText = (data.max_limit - data.usage_count).toLocaleString();
+                    document.getElementById('user-info').innerHTML = `<i class="fas fa-user-shield text-blue-400 mr-2"></i> ${data.email || 'Admin Account'}`;
+                }
+            } catch (e) {
+                console.error("Session sync failed:", e);
             }
         }
 
+        // Logic for messaging
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const chatBox = document.getElementById('chat-box');
-            if(!input.value) return;
+            const sendBtn = document.getElementById('send-btn');
+            const prompt = input.value.trim();
 
-            // Display User Message
-            const userMsg = input.value;
-            chatBox.innerHTML += `<div class="bg-gray-700 p-3 rounded-xl ml-auto max-w-[85%] text-right">${userMsg}</div>`;
+            if (!prompt) return;
+
+            // UI Feedback
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
+            
+            chatBox.innerHTML += `
+                <div class="flex justify-end">
+                    <div class="bg-slate-700 p-4 rounded-2xl rounded-tr-none max-w-[85%] text-sm border border-slate-600 shadow-sm">
+                        ${prompt}
+                    </div>
+                </div>`;
+            
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // Call Vercel API
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: userMsg, licenseKey: licenseKey })
+                    body: JSON.stringify({ prompt: prompt, licenseKey: licenseKey })
                 });
 
                 const result = await response.json();
-                
-                // Display ShieldAI Secure Response
-                if (result.reply) {
-                    chatBox.innerHTML += `
-                        <div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl mr-auto max-w-[85%]">
-                            <p class="text-emerald-400 font-bold mb-1"><i class="fas fa-check-circle"></i> Secure Response:</p>
-                            <p class="text-emerald-50 text-xs">${result.reply}</p>
+                if (!response.ok) throw new Error(result.error || "Execution failed");
+
+                chatBox.innerHTML += `
+                    <div class="flex justify-start">
+                        <div class="bg-emerald-500/5 border border-emerald-500/20 p-5 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm">
+                            <p class="text-emerald-400 font-bold text-[9px] uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <i class="fas fa-robot"></i> Shielded Output
+                            </p>
+                            <p class="text-slate-300 text-sm leading-relaxed">${result.reply}</p>
                         </div>
-                    `;
-                } else {
-                    throw new Error(result.error);
-                }
+                    </div>`;
+
             } catch (err) {
-                chatBox.innerHTML += `<div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl text-red-400 text-xs">Error: ${err.message}</div>`;
+                chatBox.innerHTML += `
+                    <div class="flex justify-start">
+                        <div class="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-400 text-xs">
+                            <i class="fas fa-exclamation-circle mr-2"></i> ${err.message}
+                        </div>
+                    </div>`;
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = `<span>SEND</span> <i class="fas fa-paper-plane text-xs"></i>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                loadUserData();
             }
-            
-            chatBox.scrollTop = chatBox.scrollHeight;
-            loadUserData(); // Refresh stats automatically
         }
 
-        // Initialize Data on load
-        loadUserData();
+        window.onload = loadUserData;
     </script>
 </body>
 </html>

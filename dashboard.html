@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShieldAI | Secure Dashboard</title>
+    <title>ShieldAI | Enterprise Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0f172a; color: #f1f5f9; }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        body { background-color: #0f172a; color: #f1f5f9; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
@@ -22,53 +22,53 @@
                 <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-600/20">
                     <i class="fas fa-shield-alt text-white"></i>
                 </div>
-                <h1 class="text-xl font-bold tracking-tight text-white">Shield<span class="text-blue-500">AI</span></h1>
+                <h1 class="text-xl font-bold tracking-tight">Shield<span class="text-blue-500">AI</span></h1>
             </div>
             <div id="user-info" class="text-[10px] font-mono text-slate-400 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 uppercase tracking-widest">
-                Connecting...
+                <i class="fas fa-sync fa-spin"></i> Syncing...
             </div>
         </div>
     </nav>
 
     <main class="container mx-auto p-4 md:p-8 max-w-6xl">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="glass-panel p-6 rounded-2xl">
+            <div class="glass p-6 rounded-2xl">
                 <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Total Credits</p>
-                <h3 id="max-limit" class="text-2xl font-semibold">5,000</h3>
+                <h3 id="max-limit" class="text-2xl font-semibold">0</h3>
             </div>
-            <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-blue-600">
+            <div class="glass p-6 rounded-2xl border-l-4 border-l-blue-600">
                 <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Requests Used</p>
-                <h3 id="usage-count" class="text-2xl font-semibold text-blue-400">0</h3>
+                <h3 id="usage-count" class="text-2xl font-semibold text-blue-400 font-mono">0</h3>
             </div>
-            <div class="glass-panel p-6 rounded-2xl border-l-4 border-l-emerald-500">
+            <div class="glass p-6 rounded-2xl border-l-4 border-l-emerald-500">
                 <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Remaining</p>
-                <h3 id="remaining" class="text-2xl font-semibold text-emerald-400">---</h3>
+                <h3 id="remaining" class="text-2xl font-semibold text-emerald-400 font-mono">---</h3>
             </div>
         </div>
 
-        <div class="glass-panel rounded-3xl overflow-hidden flex flex-col h-[550px] shadow-2xl relative">
+        <div class="glass rounded-3xl overflow-hidden flex flex-col h-[550px] shadow-2xl relative">
             <div class="p-4 bg-slate-800/50 border-b border-slate-700 flex justify-between items-center">
                 <div class="flex items-center gap-2 text-xs font-medium text-emerald-400">
                     <span class="relative flex h-2 w-2">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    Privacy Shield Active
+                    Secure AI Node: Active
                 </div>
             </div>
             
             <div id="chat-box" class="flex-1 p-6 overflow-y-auto space-y-4 custom-scrollbar">
                 <div class="bg-blue-600/10 border border-blue-500/20 p-4 rounded-2xl text-blue-200 text-sm max-w-[85%]">
-                    Welcome. Your session is secured.
+                    <i class="fas fa-lock mr-2"></i> Welcome. Your data is encrypted and PII-redacted.
                 </div>
             </div>
 
             <div class="p-4 bg-slate-900/60 border-t border-slate-700">
                 <div class="flex gap-3">
                     <input id="user-input" type="text" onkeypress="if(event.key === 'Enter') sendMessage()"
-                        placeholder="Type your message..." 
-                        class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm">
-                    <button id="send-btn" onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 active:scale-95 transition-all">
+                        placeholder="Type your secure prompt..." 
+                        class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm transition-all">
+                    <button id="send-btn" onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 active:scale-95 transition-all shadow-lg shadow-blue-600/20">
                         <span>SEND</span>
                         <i class="fas fa-paper-plane text-[10px]"></i>
                     </button>
@@ -78,21 +78,34 @@
     </main>
 
     <script>
+        // 1. Configuration (Client Side - Use ANON Key)
         const supabaseUrl = 'https://xjjuvagvfaocvszztkgh.supabase.co';
-        const supabaseKey = 'YOUR_ACTUAL_ANON_KEY'; 
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseKey = 'YOUR_SUPABASE_ANON_KEY'; // ضع الـ Anon Key هنا للقراءة
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
         let licenseKey = localStorage.getItem('shield_key') || 'admin123';
 
+        // 2. Load Data Function (الجزء المسؤول عن تحديث الأرقام)
         async function loadUserData() {
-            const { data } = await supabaseClient.from('usage_tracking').select('*').eq('license_key', licenseKey).single();
-            if (data) {
-                document.getElementById('usage-count').innerText = data.usage_count;
-                document.getElementById('max-limit').innerText = data.max_limit;
-                document.getElementById('remaining').innerText = data.max_limit - data.usage_count;
-                document.getElementById('user-info').innerText = data.email || 'Admin Account';
+            try {
+                const { data, error } = await supabase
+                    .from('usage_tracking')
+                    .select('*')
+                    .eq('license_key', licenseKey)
+                    .single();
+
+                if (data) {
+                    document.getElementById('usage-count').innerText = data.usage_count.toLocaleString();
+                    document.getElementById('max-limit').innerText = data.max_limit.toLocaleString();
+                    document.getElementById('remaining').innerText = (data.max_limit - data.usage_count).toLocaleString();
+                    document.getElementById('user-info').innerHTML = `<i class="fas fa-user-shield text-blue-400 mr-2"></i> ${data.email || 'Admin'}`;
+                }
+            } catch (err) {
+                console.error("Sync Error:", err);
             }
         }
 
+        // 3. Send Message Function (الحل الجذري للربط)
         async function sendMessage() {
             const input = document.getElementById('user-input');
             const chatBox = document.getElementById('chat-box');
@@ -101,8 +114,11 @@
 
             if (!prompt) return;
 
+            // UI Feedback
             sendBtn.disabled = true;
-            chatBox.innerHTML += `<div class="flex justify-end"><div class="bg-slate-700 p-3 rounded-2xl rounded-tr-none text-sm border border-slate-600">${prompt}</div></div>`;
+            sendBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i>`;
+            
+            chatBox.innerHTML += `<div class="flex justify-end"><div class="bg-slate-700 p-3 rounded-2xl rounded-tr-none text-sm border border-slate-600 shadow-sm">${prompt}</div></div>`;
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -113,18 +129,31 @@
                     body: JSON.stringify({ prompt: prompt, licenseKey: licenseKey })
                 });
 
-                if (!response.ok) throw new Error("API Route Not Found or Server Error");
-
                 const result = await response.json();
-                chatBox.innerHTML += `<div class="flex justify-start"><div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl rounded-tl-none text-emerald-50 text-sm">${result.reply}</div></div>`;
+                
+                if (!response.ok) throw new Error(result.error || "Server error");
+
+                // Display AI Response
+                chatBox.innerHTML += `
+                    <div class="flex justify-start">
+                        <div class="bg-emerald-500/5 border border-emerald-500/20 p-4 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm">
+                            <p class="text-emerald-400 font-bold text-[9px] tracking-widest mb-1 uppercase italic">ShieldAI Output</p>
+                            <p class="text-slate-300 text-sm leading-relaxed">${result.reply}</p>
+                        </div>
+                    </div>`;
+
             } catch (err) {
-                chatBox.innerHTML += `<div class="bg-red-500/10 p-3 rounded-xl text-red-400 text-xs text-center border border-red-500/20">Error: Please ensure /api/chat.js exists in your Vercel project.</div>`;
+                chatBox.innerHTML += `<div class="bg-red-500/10 p-3 rounded-xl text-red-400 text-xs text-center border border-red-500/20"><i class="fas fa-exclamation-triangle mr-2"></i> Error: ${err.message}</div>`;
             } finally {
                 sendBtn.disabled = false;
+                sendBtn.innerHTML = `<span>SEND</span> <i class="fas fa-paper-plane text-[10px]"></i>`;
                 chatBox.scrollTop = chatBox.scrollHeight;
-                loadUserData();
+                
+                // --- الحل الجذري: إعادة جلب الأرقام فوراً بعد الإرسال ---
+                setTimeout(loadUserData, 500); 
             }
         }
+
         window.onload = loadUserData;
     </script>
 </body>

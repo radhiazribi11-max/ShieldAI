@@ -1,5 +1,9 @@
 {
+  "name": "shield-ai",
+  "version": "1.0.0",
   "dependencies": {
-    "@supabase/supabase-js": "^2.0.0"
+    "@supabase/supabase-js": "^2.0.0",
+    "node-fetch": "^2.6.7"
   }
 }
+

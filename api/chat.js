@@ -1,7 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
+const fetch = require('node-fetch'); // التأكد من استدعاء مكتبة الجلب
 
 module.exports = async (req, res) => {
-    // إعدادات CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -12,14 +12,14 @@ module.exports = async (req, res) => {
     const { prompt, licenseKey } = req.body;
 
     try {
-        // 1. التحقق من الرصيد وخصم الطلب
+        // 1. التحقق من الرصيد
         const { data: user } = await supabase.from('usage_tracking').select('*').eq('license_key', licenseKey).single();
         
         if (!user || user.usage_count >= user.max_limit) {
-            return res.status(403).json({ reply: "Credit limit reached. Please upgrade." });
+            return res.status(403).json({ reply: "Credit limit reached." });
         }
 
-        // 2. الاتصال بمحرك Groq AI للحصول على إجابة حقيقية
+        // 2. الاتصال بـ Groq بأسلوب مستقر
         const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -27,18 +27,23 @@ module.exports = async (req, res) => {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "mixtral-8x7b-32768", // موديل سريع وذكي جداً
+                model: "llama3-8b-8192", // موديل قوي وسريع جداً
                 messages: [
-                    { role: "system", content: "You are ShieldAI, a secure, professional privacy assistant. Provide concise, helpful, and intelligent answers." },
+                    { role: "system", content: "You are ShieldAI, a secure assistant. Answer the user briefly and professionally." },
                     { role: "user", content: prompt }
                 ]
             })
         });
 
         const groqData = await groqResponse.json();
+        
+        if (!groqData.choices) {
+            throw new Error("Groq API Key missing or invalid in Vercel settings.");
+        }
+
         const aiReply = groqData.choices[0].message.content;
 
-        // 3. تحديث العداد في قاعدة البيانات
+        // 3. تحديث العداد
         await supabase
             .from('usage_tracking')
             .update({ usage_count: user.usage_count + 1 })
@@ -47,8 +52,6 @@ module.exports = async (req, res) => {
         return res.status(200).json({ reply: aiReply });
 
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ reply: "Connection to AI Node failed. Please try again." });
+        return res.status(500).json({ reply: "System Error: " + err.message });
     }
 };
-            

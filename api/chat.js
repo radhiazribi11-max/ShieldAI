@@ -14,33 +14,47 @@ const API_KEY = process.env.GEMINI_KEY;
 
 try {
 
-const response = await fetch(
+const aiRes = await fetch(
 `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
 {
 method: "POST",
-headers: { "Content-Type": "application/json" },
+headers: {
+"Content-Type": "application/json"
+},
 body: JSON.stringify({
 contents: [
 {
-parts: [{ text: prompt }]
+parts: [
+{ text: prompt }
+]
 }
 ]
 })
 }
 );
 
-const data = await response.json();
+const data = await aiRes.json();
 
-const reply =
-data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-"No response";
+console.log("Gemini response:", data);
 
-res.status(200).json({ reply });
+if (!data.candidates) {
+return res.status(500).json({
+error: "AI did not return candidates",
+debug: data
+});
+}
+
+const reply = data.candidates[0].content.parts[0].text;
+
+return res.status(200).json({ reply });
 
 } catch (error) {
 
-res.status(500).json({ error: "AI Server Error" });
+return res.status(500).json({
+error: "Server error",
+details: error.message
+});
 
 }
 
-}
+  }

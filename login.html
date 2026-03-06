@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | ShieldAI Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #050a18; color: #e2e8f0; }
+        .login-card { background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(56, 189, 248, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+    <div class="login-card max-w-sm w-full p-8 rounded-[30px] shadow-2xl">
+        <div class="text-center mb-8">
+            <h2 class="text-2xl font-black italic">🛡️ SHIELD<span class="text-sky-400">AI</span></h2>
+            <p class="text-slate-500 text-xs mt-2 uppercase tracking-widest font-bold">Secure Access Gateway</p>
+        </div>
+        <form class="space-y-4">
+            <div>
+                <label class="text-[10px] uppercase text-slate-500 font-bold ml-1">Email Address</label>
+                <input type="email" placeholder="name@company.com" class="w-full bg-slate-900 border border-slate-800 p-3 rounded-xl text-sm outline-none focus:border-sky-500 transition-all">
+            </div>
+            <button type="button" onclick="window.location.href='index.html'" class="w-full bg-sky-600 hover:bg-sky-500 py-3 rounded-xl font-bold text-sm shadow-lg shadow-sky-900/40 transition-all">
+                Enter Dashboard
+            </button>
+        </form>
+        <p class="text-center text-[10px] text-slate-600 mt-6">
+            Don't have a license? <a href="landing.html#pricing" class="text-sky-400 underline">Get one here</a>
+        </p>
+    </div>
+</body>
+</html>
+
